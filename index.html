@@ -182,6 +182,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>สถานะซ่อม:</label><select id="ov-next" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ov-ck09" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>หนี้ค้าง:</label><select id="ov-debt" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
+    <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">1-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <button class="fbtn fbtn-clr" onclick="ovClear()">✕ ล้าง</button>
     <span class="fcnt" id="ov-cnt"></span>
   </div>
@@ -245,6 +246,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ปรับสรุปการ UPDATE:</label><select id="na-upd" onchange="renNA()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="na-ck09" onchange="renNA()"><option value="">ทั้งหมด</option></select>
     <label>หนี้ค้าง:</label><select id="na-debt" onchange="renNA()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
+    <label>วันค้างสถานะ:</label><select id="na-lag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="1-30">1-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <button class="fbtn fbtn-clr" onclick="naClear()">✕ ล้าง</button>
     <span class="fcnt" id="na-cnt"></span>
   </div>
@@ -301,6 +303,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ปรับสรุปการ UPDATE:</label><select id="mn-upd" onchange="renMn()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="mn-ck09" onchange="renMn()"><option value="">ทั้งหมด</option></select>
     <label>หนี้ค้าง:</label><select id="mn-debt" onchange="renMn()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
+    <label>วันค้างสถานะ:</label><select id="mn-lag" onchange="renMn()"><option value="">ทั้งหมด</option><option value="1-30">1-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <button class="fbtn fbtn-clr" onclick="mnClear()">✕ ล้าง</button>
     <span class="fcnt" id="mn-cnt"></span>
   </div>
@@ -406,7 +409,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),nc=getV('ov-next');
   const ck9=getV('ov-ck09');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!ck9||x.ck_aging09===ck9)&&(!getV('ov-debt')||(getV('ov-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)));
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!ck9||x.ck_aging09===ck9)&&(!getV('ov-debt')||(getV('ov-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)&&(!getV('ov-lag')||(()=>{const lg=Number(x.days_lag||0),rg=getV('ov-lag');if(rg==='1-30')return lg>=1&&lg<=30;if(rg==='31-60')return lg>=31&&lg<=60;if(rg==='61-90')return lg>=61&&lg<=90;if(rg==='90+')return lg>90;return true;})())));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -424,7 +427,7 @@ function ovBPChange(){
 function ovClear(){
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');
   setV('ov-guarantee','');setV('ov-confirm','');setV('ov-next','');
-  setV('ov-ck09','');setV('ov-debt','');
+  setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');
   ovStatFilter='';
   updSel('ov-bp',uniq(AF,'bp'),'');
   updSel('ov-proj',uniq(AF,'proj'),'');
@@ -582,7 +585,7 @@ let naUpdFilter='';
 function naBase(){return NA;}
 function naFiltered(){
   const d=getV('na-dept'),b=getV('na-bp'),p=getV('na-proj'),u=getV('na-upd');
-  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!getV('na-ck09')||x.ck_aging09===getV('na-ck09'))&&(!getV('na-debt')||(getV('na-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)));
+  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!getV('na-ck09')||x.ck_aging09===getV('na-ck09'))&&(!getV('na-debt')||(getV('na-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)&&(!getV('na-lag')||(()=>{const lg=Number(x.days_lag||0),rg=getV('na-lag');if(rg==='1-30')return lg>=1&&lg<=30;if(rg==='31-60')return lg>=31&&lg<=60;if(rg==='61-90')return lg>=61&&lg<=90;if(rg==='90+')return lg>90;return true;})())));
 }
 function naDeptChange(){
   const d=getV('na-dept'),base=d?naBase().filter(x=>x.dept===d):naBase();
@@ -598,7 +601,7 @@ function naBPChange(){
   renNA();
 }
 function naClear(){
-  ['na-dept','na-bp','na-proj','na-upd','na-ck09','na-debt'].forEach(id=>setV(id,''));
+  ['na-dept','na-bp','na-proj','na-upd','na-ck09','na-debt','na-lag'].forEach(id=>setV(id,''));
   const nb=naBase();
   updSel('na-bp',uniq(nb,'bp'),'');updSel('na-proj',uniq(nb,'proj'),'');
   updSel('na-upd',uniq(nb,'update'),'');updSel('na-ck09',uniq(nb,'ck_aging09').filter(Boolean),'');
@@ -766,7 +769,7 @@ function renPV(){
 // ════════════════════════════════
 function mnFiltered(){
   const d=getV('mn-dept'),b=getV('mn-bp'),p=getV('mn-proj'),u=getV('mn-upd');
-  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!getV('mn-ck09')||x.ck_aging09===getV('mn-ck09'))&&(!getV('mn-debt')||(getV('mn-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)));
+  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!getV('mn-ck09')||x.ck_aging09===getV('mn-ck09'))&&(!getV('mn-debt')||(getV('mn-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)&&(!getV('mn-lag')||(()=>{const lg=Number(x.days_lag||0),rg=getV('mn-lag');if(rg==='1-30')return lg>=1&&lg<=30;if(rg==='31-60')return lg>=31&&lg<=60;if(rg==='61-90')return lg>=61&&lg<=90;if(rg==='90+')return lg>90;return true;})())));
 }
 function mnDeptChange(){
   const d=getV('mn-dept'),base=d?MN.filter(x=>x.dept===d):MN;
@@ -784,7 +787,7 @@ function mnBPChange(){
 function mnClear(){
   ['mn-dept','mn-bp','mn-proj','mn-upd'].forEach(id=>setV(id,''));
   updSel('mn-bp',uniq(MN,'bp'),'');updSel('mn-proj',uniq(MN,'proj'),'');
-  setV('mn-debt','');updSel('mn-upd',uniq(MN,'update'),'');updSel('mn-ck09',uniq(MN,'ck_aging09').filter(Boolean),'');renMn();
+  setV('mn-debt','');setV('mn-lag','');updSel('mn-upd',uniq(MN,'update'),'');updSel('mn-ck09',uniq(MN,'ck_aging09').filter(Boolean),'');renMn();
 }
 function mnKpiClick(k){
   if(k==='all'){setV('mn-dept','');updSel('mn-bp',uniq(MN,'bp'),'');updSel('mn-proj',uniq(MN,'proj'),'');}
