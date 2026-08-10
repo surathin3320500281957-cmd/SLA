@@ -397,7 +397,16 @@ function updSel(id,opts,cur){
   if(prev&&!opts.includes(prev))el.value='';
 }
 function getV(id){return document.getElementById(id)?.value||'';}
-function setV(id,v){const el=document.getElementById(id);if(el)el.value=v;}
+
+function inLagRange(days_lag,range){
+  if(!range)return true;
+  const lg=Number(days_lag||0);
+  if(range==='1-30')return lg>=1&&lg<=30;
+  if(range==='31-60')return lg>=31&&lg<=60;
+  if(range==='61-90')return lg>=61&&lg<=90;
+  if(range==='90+')return lg>90;
+  return true;
+}function setV(id,v){const el=document.getElementById(id);if(el)el.value=v;}
 
 // ════════════════════════════════
 // OVERVIEW
@@ -408,8 +417,8 @@ let ovStatFilter='';
 function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),nc=getV('ov-next');
-  const ck9=getV('ov-ck09');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!ck9||x.ck_aging09===ck9)&&(!getV('ov-debt')||(getV('ov-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)&&(!getV('ov-lag')||(()=>{const lg=Number(x.days_lag||0),rg=getV('ov-lag');if(rg==='1-30')return lg>=1&&lg<=30;if(rg==='31-60')return lg>=31&&lg<=60;if(rg==='61-90')return lg>=61&&lg<=90;if(rg==='90+')return lg>90;return true;})())));
+  const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag');
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -585,7 +594,8 @@ let naUpdFilter='';
 function naBase(){return NA;}
 function naFiltered(){
   const d=getV('na-dept'),b=getV('na-bp'),p=getV('na-proj'),u=getV('na-upd');
-  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!getV('na-ck09')||x.ck_aging09===getV('na-ck09'))&&(!getV('na-debt')||(getV('na-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)&&(!getV('na-lag')||(()=>{const lg=Number(x.days_lag||0),rg=getV('na-lag');if(rg==='1-30')return lg>=1&&lg<=30;if(rg==='31-60')return lg>=31&&lg<=60;if(rg==='61-90')return lg>=61&&lg<=90;if(rg==='90+')return lg>90;return true;})())));
+  const ck9=getV('na-ck09'),debt=getV('na-debt'),lag=getV('na-lag');
+  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag));
 }
 function naDeptChange(){
   const d=getV('na-dept'),base=d?naBase().filter(x=>x.dept===d):naBase();
@@ -769,7 +779,8 @@ function renPV(){
 // ════════════════════════════════
 function mnFiltered(){
   const d=getV('mn-dept'),b=getV('mn-bp'),p=getV('mn-proj'),u=getV('mn-upd');
-  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!getV('mn-ck09')||x.ck_aging09===getV('mn-ck09'))&&(!getV('mn-debt')||(getV('mn-debt')==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt)&&(!getV('mn-lag')||(()=>{const lg=Number(x.days_lag||0),rg=getV('mn-lag');if(rg==='1-30')return lg>=1&&lg<=30;if(rg==='31-60')return lg>=31&&lg<=60;if(rg==='61-90')return lg>=61&&lg<=90;if(rg==='90+')return lg>90;return true;})())));
+  const ck9=getV('mn-ck09'),debt=getV('mn-debt'),lag=getV('mn-lag');
+  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag));
 }
 function mnDeptChange(){
   const d=getV('mn-dept'),base=d?MN.filter(x=>x.dept===d):MN;
