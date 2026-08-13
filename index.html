@@ -229,7 +229,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
       <th class="hg">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
-      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th>
+      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
     </tr></thead><tbody id="ovBody"></tbody></table></div>
   </div>
 </div>
@@ -284,7 +284,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
       <th class="hg">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
-      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th>
+      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
     </tr></thead><tbody id="ovnaBody"></tbody></table></div>
   </div>
 </div>
@@ -340,7 +340,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
       <th class="hg">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
-      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th>
+      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
     </tr></thead><tbody id="naBody"></tbody></table></div>
   </div>
 </div>
@@ -400,7 +400,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
       <th class="hg">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
-      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th>
+      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
     </tr></thead><tbody id="mnBody"></tbody></table></div>
   </div>
 </div>
@@ -458,6 +458,28 @@ function updSel(id,opts,cur){
 }
 function getV(id){return document.getElementById(id)?.value||'';}
 
+// วันที่อ้างอิงสำหรับคำนวณ "วันค้างสถานะซ่อมหลังสุด" — ตรงกับวันที่ update ข้อมูล (ค.ศ.)
+const UPD_REF_DATE=new Date(2026,7,13); // เดือนใน JS Date เริ่มที่ 0 → 7=สิงหาคม
+function ckLagInfo(ck_custcare_st_raw,days_lag){
+  const raw=(ck_custcare_st_raw||'').trim();
+  if(!raw)return{txt:'ไม่เคยซ่อม',cls:'gy'};
+  const parts=raw.split(' ');
+  if(parts.length>=2&&/^\d{8}$/.test(parts[0])){
+    const y=+parts[0].slice(0,4),m=+parts[0].slice(4,6),d=+parts[0].slice(6,8);
+    const diff=Math.round((UPD_REF_DATE-new Date(y,m-1,d))/86400000);
+    if(diff<0)return{txt:'—',cls:'gy'};
+    return{txt:String(diff),cls:diff>30?'rd':diff>14?'or':'gr'};
+  }
+  // มีข้อความสถานะแต่ไม่มีวันที่ (สถานะซ่อมกำลังดำเนินอยู่) → ใช้ days_lag เดิม
+  const dl=Number(days_lag||0);
+  if(!days_lag)return{txt:'—',cls:'gy'};
+  return{txt:String(days_lag),cls:dl>30?'rd':dl>14?'or':'gr'};
+}
+function ckLagTd(ck_custcare_st_raw,days_lag){
+  const info=ckLagInfo(ck_custcare_st_raw,days_lag);
+  const colorMap={rd:'#DC2626',or:'#D97706',gr:'#059669',gy:'var(--t4)'};
+  return`<td style="text-align:right;font-weight:700;color:${colorMap[info.cls]};font-size:${info.txt==='ไม่เคยซ่อม'?'12px':'inherit'};">${info.txt}</td>`;
+}
 function inLagRange(days_lag,range){
   if(!range)return true;
   const lg=Number(days_lag||0);
@@ -591,7 +613,7 @@ function renOv(){
     <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
     </tr>`).join('');
   // Pivot summary table (ตารางสรุป) — uses same filtered data
   const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -733,7 +755,7 @@ function renOvNA(){
     <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
     </tr>`).join('');
   // Summary pivot table (สรุปไม่ดำเนินการภาพรวม) — uses same filtered data
   const ovnaDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -849,7 +871,7 @@ function renNA(){
     <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
     </tr>`).join('');
   // NP summary table (สรุปไม่ดำเนินการ) — uses same filtered data
   const npDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -1038,7 +1060,7 @@ function renMn(){
     <td style="font-size:12px;white-space:nowrap;">${d.d11||'—'}</td>
     <td style="text-align:right;font-weight:600;">${d.aging09||'—'}</td>
     <td><span class="badge ${d.ck_aging09?'brd':'bgy'}">${d.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${d.days_lag>30?'#DC2626':d.days_lag>14?'#D97706':d.days_lag?'#059669':'var(--t4)'}">${d.days_lag||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${d.days_lag>30?'#DC2626':d.days_lag>14?'#D97706':d.days_lag?'#059669':'var(--t4)'}">${d.days_lag||'—'}</td>${ckLagTd(d.ck_custcare_st,d.days_lag)}
     </tr>`).join('');
   // MN Summary table (สรุปไม่ดำเนินการเดือนก่อน)
   const mnDeps=[...new Set(f.map(x=>x.dept))].sort();
