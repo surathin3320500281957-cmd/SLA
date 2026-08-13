@@ -513,7 +513,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),nc=getV('ov-next'),cs=getV('ov-custcare');
   const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!cs||x.update===cs)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!cs||(cs==='ไม่ดำเนินการ'?x.status==='ไม่ดำเนินการ':x.update===cs))&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -1160,7 +1160,8 @@ function initCharts(){
 // ════════════════════════════════
 function initDDs(){
   updSel('ov-dept',uniq(AF,'dept'),'');updSel('ov-bp',uniq(AF,'bp'),'');updSel('ov-proj',uniq(AF,'proj'),'');
-  updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');updSel('ov-next',uniq(AF,'next_custcare').filter(Boolean),'');updSel('ov-custcare',uniq(AF,'update').filter(Boolean),'');
+  updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');updSel('ov-next',uniq(AF,'next_custcare').filter(Boolean),'');
+  updSel('ov-custcare',['รับคำร้องแจ้งซ่อม','สำรวจซ่อม','ยืนยันการสำรวจซ่อม','ประมาณราคา','ตรวจสอบและรับรองราคา','อนุมัติสรุปค่าก่อสร้าง','รอการจัดจ้าง','จัดหาผู้รับจ้าง','ดำเนินการซ่อม','ดำเนินการเสร็จสิ้น','ขอเบิกเงินค่าจ้าง','ไม่ดำเนินการ'],'');
   updSel('ov-ck09',uniq(AF,'ck_aging09').filter(Boolean),'');updSel('ov-ck',uniq(AF,'ck_custcare_st_grp').filter(Boolean),'');
   const nb=naBase();
   updSel('na-dept',uniq(nb,'dept'),'');updSel('na-bp',uniq(nb,'bp'),'');
