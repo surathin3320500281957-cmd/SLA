@@ -223,7 +223,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="ht">เริ่มสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
       <th class="ho">การค้ำประกัน</th>
       <th class="ho">เช็คสถานะซ่อมหลังสุด</th>
-      <th class="hw">การซ่อม</th><th class="hi">สถานะซ่อม</th>
+      <th class="hw">การซ่อม</th><th class="hi">สถานะซ่อม</th><th class="hi" style="background:#E0EDFF;">สถานะซ่อมปัจจุบัน</th>
       <th class="hg">รับคำร้องแจ้งซ่อม</th><th class="hg">สำรวจซ่อม</th>
       <th class="hg">ยืนยันการสำรวจซ่อม</th><th class="hg">ประมาณราคา</th>
       <th class="hg">ตรวจสอบและรับรองราคา</th><th class="hg">อนุมัติสรุปค่าก่อสร้าง</th>
@@ -613,6 +613,7 @@ function renOv(){
     <td style="font-size:12px;">${x.ck_custcare_st||'—'}</td>
     <td><span class="badge ${CFB[x.confirm_flag]||'bgy'}">${x.confirm_flag||'—'}</span></td>
     <td><span class="badge ${SB[x.next_custcare]||'bgy'}">${x.next_custcare||'—'}</span></td>
+    <td><span class="badge ${SB[x.update]||'bgy'}" style="border:1px solid #B4D2F5;">${x.update||'—'}</span></td>
     <td style="font-size:12px;white-space:nowrap;">${x.d01||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.d02||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.d03||'—'}</td>
