@@ -181,7 +181,8 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>โครงการ:</label><select id="ov-proj" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>การค้ำประกัน:</label><select id="ov-guarantee" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>การซ่อม:</label><select id="ov-confirm" onchange="renOv()"><option value="">ทั้งหมด</option></select>
-    <label>สถานะซ่อม:</label><select id="ov-next" onchange="renOv()"><option value="">ทั้งหมด</option></select>
+    <span style="display:none;"><label>สถานะซ่อม:</label><select id="ov-next" onchange="renOv()"><option value="">ทั้งหมด</option></select></span>
+    <label>สถานะซ่อมปัจจุบัน:</label><select id="ov-custcare" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ov-ck09" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>หนี้ค้าง:</label><select id="ov-debt" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
     <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
@@ -510,9 +511,9 @@ let ovStatFilter='';
 
 function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj');
-  const g=getV('ov-guarantee'),cf=getV('ov-confirm'),nc=getV('ov-next');
+  const g=getV('ov-guarantee'),cf=getV('ov-confirm'),nc=getV('ov-next'),cs=getV('ov-custcare');
   const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!nc||x.next_custcare===nc)&&(!cs||x.update===cs)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -529,7 +530,7 @@ function ovBPChange(){
 }
 function ovClear(){
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');
-  setV('ov-guarantee','');setV('ov-confirm','');setV('ov-next','');
+  setV('ov-guarantee','');setV('ov-confirm','');setV('ov-next','');setV('ov-custcare','');
   setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');
   ovStatFilter='';
   updSel('ov-bp',uniq(AF,'bp'),'');
@@ -1159,7 +1160,7 @@ function initCharts(){
 // ════════════════════════════════
 function initDDs(){
   updSel('ov-dept',uniq(AF,'dept'),'');updSel('ov-bp',uniq(AF,'bp'),'');updSel('ov-proj',uniq(AF,'proj'),'');
-  updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');updSel('ov-next',uniq(AF,'next_custcare').filter(Boolean),'');
+  updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');updSel('ov-next',uniq(AF,'next_custcare').filter(Boolean),'');updSel('ov-custcare',uniq(AF,'update').filter(Boolean),'');
   updSel('ov-ck09',uniq(AF,'ck_aging09').filter(Boolean),'');updSel('ov-ck',uniq(AF,'ck_custcare_st_grp').filter(Boolean),'');
   const nb=naBase();
   updSel('na-dept',uniq(nb,'dept'),'');updSel('na-bp',uniq(nb,'bp'),'');
