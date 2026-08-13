@@ -41,6 +41,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t1);font-
 .tp-b{background:var(--bluL);color:var(--blu);}
 .tp-r{background:var(--redL);color:var(--red);}
 .tp-i{background:var(--indL);color:var(--ind);}
+.tp-o{background:var(--orgL);color:var(--org);}
 .tpane{display:none;padding:22px 32px 40px;}
 .tpane.on{display:block;}
 /* KPI */
@@ -165,6 +166,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
 </div>
 <div class="tabbar">
   <button class="tbtn on" onclick="sw('ov',this)">📊 ภาพรวม <span class="tpill tp-b" id="tb-ov">1,023</span></button>
+  <button class="tbtn" onclick="sw('ovna',this)">🔶 ไม่ดำเนินการภาพรวม <span class="tpill tp-o" id="tb-ovna">0</span></button>
   <button class="tbtn" onclick="sw('na',this)">⚠️ ไม่ดำเนินการ(สคล/สคจ ชี้แจง) <span class="tpill tp-r" id="tb-na">134</span></button>
   <button class="tbtn" onclick="sw('mn',this)">📅 ไม่ดำเนินการ(ข้อมูลหน่วยงานอื่น) <span class="tpill tp-i" id="tb-mn">151</span></button>
 </div>
@@ -229,6 +231,61 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
       <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th>
     </tr></thead><tbody id="ovBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ══ NO ACTION (OVERVIEW-BASED) ══ -->
+<div id="tp-ovna" class="tpane">
+  <div class="wban" style="background:var(--orgL);"><span style="font-size:22px;">🔶</span><div>
+    <h4>รายการ "ไม่ดำเนินการ" จากภาพรวมทั้งหมด (sheet AF)</h4>
+    <p>กรองจาก AF (สถานะซ่อม = "ไม่ดำเนินการ") → เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "สำหรับกรอง-ตรวจสอบ" | คอลัมน์ "ปรับสรุปการ UPDATE"</p>
+  </div></div>
+  <div class="frow">
+    <label>กอง:</label><select id="ovna-dept" onchange="ovnaDeptChange()"><option value="">ทั้งหมด</option></select>
+    <span class="sep">›</span>
+    <label>สาขา:</label><select id="ovna-bp" onchange="ovnaBPChange()"><option value="">ทั้งหมด</option></select>
+    <span class="sep">›</span>
+    <label>โครงการ:</label><select id="ovna-proj" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
+    <label>ปรับสรุปการ UPDATE:</label><select id="ovna-upd" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
+    <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ovna-ck09" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
+    <label>หนี้ค้าง:</label><select id="ovna-debt" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
+    <label>วันค้างสถานะ:</label><select id="ovna-lag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="1-30">1-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>เช็คสถานะซ่อมหลังสุด:</label><select id="ovna-ck" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
+    <button class="fbtn fbtn-clr" onclick="ovnaClear()">✕ ล้าง</button>
+    <span class="fcnt" id="ovna-cnt"></span>
+  </div>
+  <div class="krow k4" id="ovnaKRow"></div>
+  <div class="twocol">
+    <div class="ccard"><div class="ctit" style="margin-bottom:8px;">สัดส่วน ปรับสรุปการ UPDATE</div>
+      <div class="leg" id="ovna-pie-leg"></div>
+      <div style="position:relative;height:165px;"><canvas id="cOvnaUpd"></canvas></div></div>
+    <div class="ccard"><div class="ctit" style="margin-bottom:8px;">จำนวนตามสถานะ UPDATE</div>
+      <div class="plist" id="ovnaUpdProg"></div></div>
+  </div>
+  <div class="sec">
+    <div class="ebar"><span class="elbl">📤 Export:</span>
+      <button class="bex bxl" onclick="exXL('tOvNAP','สรุปไม่ดำเนินการภาพรวม')">⬇ Excel</button>
+      <button class="bex bpd" onclick="exPDF('tOvNAP','สรุปไม่ดำเนินการภาพรวม')">⬇ PDF</button></div>
+    <div class="twrap" id="ovnaPvWrap"></div>
+  </div>
+  <div class="sec">
+    <div class="ebar"><span class="elbl">📤 Export:</span>
+      <button class="bex bxl" onclick="exXL('tOvNA','ไม่ดำเนินการภาพรวม')">⬇ Excel</button>
+      <button class="bex bpd" onclick="exPDF('tOvNA','ไม่ดำเนินการภาพรวม')">⬇ PDF</button></div>
+    <div class="twrap"><table id="tOvNA"><thead><tr>
+      <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
+      <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
+      <th class="hg">การค้ำประกัน</th><th class="hg">เช็คสถานะซ่อมหลังสุด</th><th class="ho">ปรับสรุปการ UPDATE</th>
+      <th class="hg">รับคำร้องแจ้งซ่อม</th><th class="hg">สำรวจซ่อม</th>
+      <th class="hg">ยืนยันการสำรวจซ่อม</th><th class="hg">ประมาณราคา</th>
+      <th class="hg">ตรวจสอบและรับรองราคา</th><th class="hg">อนุมัติสรุปค่าก่อสร้าง</th>
+      <th class="hg">รอการจัดจ้าง</th><th class="hg">จัดหาผู้รับจ้าง</th>
+      <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
+      <th class="hg">ขอเบิกเงินค่าจ้าง</th>
+      <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
+      <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th>
+    </tr></thead><tbody id="ovnaBody"></tbody></table></div>
   </div>
 </div>
 
@@ -591,6 +648,123 @@ function renDt(){
 }
 
 // ════════════════════════════════
+// NO ACTION (OVERVIEW-BASED) — AF filtered by status==='ไม่ดำเนินการ'
+// update field มาจาก AF ที่ join กับ สำหรับกรอง-ตรวจสอบ ไว้แล้วตอน build
+// ════════════════════════════════
+const OVNA=AF.filter(x=>x.status==='ไม่ดำเนินการ');
+function ovnaBase(){return OVNA;}
+function ovnaFiltered(){
+  const d=getV('ovna-dept'),b=getV('ovna-bp'),p=getV('ovna-proj'),u=getV('ovna-upd');
+  const ck9=getV('ovna-ck09'),debt=getV('ovna-debt'),lag=getV('ovna-lag'),ck=getV('ovna-ck');
+  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck));
+}
+function ovnaDeptChange(){
+  const d=getV('ovna-dept'),base=d?ovnaBase().filter(x=>x.dept===d):ovnaBase();
+  updSel('ovna-bp',uniq(base,'bp'),'');
+  updSel('ovna-proj',uniq(base,'proj'),'');
+  updSel('ovna-upd',uniq(base,'update'),'');updSel('ovna-ck09',uniq(base,'ck_aging09').filter(Boolean),'');
+  renOvNA();
+}
+function ovnaBPChange(){
+  const d=getV('ovna-dept'),b=getV('ovna-bp'),base=ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b));
+  updSel('ovna-proj',uniq(base,'proj'),'');
+  updSel('ovna-upd',uniq(base,'update'),'');updSel('ovna-ck09',uniq(base,'ck_aging09').filter(Boolean),'');
+  renOvNA();
+}
+function ovnaClear(){
+  ['ovna-dept','ovna-bp','ovna-proj','ovna-upd','ovna-ck09','ovna-debt','ovna-lag','ovna-ck'].forEach(id=>setV(id,''));
+  const ob=ovnaBase();
+  updSel('ovna-bp',uniq(ob,'bp'),'');updSel('ovna-proj',uniq(ob,'proj'),'');
+  updSel('ovna-upd',uniq(ob,'update'),'');updSel('ovna-ck09',uniq(ob,'ck_aging09').filter(Boolean),'');
+  renOvNA();
+}
+function renOvNA(){
+  const f=ovnaFiltered();
+  const t=f.length||1;
+  document.getElementById('ovna-cnt').textContent=`แสดง ${f.length} รายการ`;
+  document.getElementById('tb-ovna').textContent=ovnaBase().length;
+  // KPI cards — grouped by dept, clickable
+  const deps=['มบ.','ตบ.1','ตบ.2'];
+  document.getElementById('ovnaKRow').innerHTML=[
+    {i:'🔶',l:'ทั้งหมด',v:f.length,p:'รายการ',c:'#D97706',k:'all'},
+    ...deps.map(d=>{const c=f.filter(x=>x.dept===d).length;
+      return{i:'🏢',l:`กอง ${d}`,v:c,p:`${(c/t*100).toFixed(1)}%`,c:DC[d],k:d};})
+  ].map(k=>`<div class="kcard ${getV('ovna-dept')===k.k&&k.k!=='all'?'sel':''}" style="--kc:${k.c}"
+    onclick="ovnaKpiClick('${k.k}')">
+    <div class="khead"><div class="kicon">${k.i}</div><div class="klbl">${k.l}</div></div>
+    <div class="kval">${k.v.toLocaleString()}</div><div class="ksub">${k.p}</div>
+  </div>`).join('');
+  // Pie & progress — based on filtered data
+  const updCnt=cb(f,'update');
+  const sorted=Object.entries(updCnt).sort((a,b)=>b[1]-a[1]);
+  const total=f.length||1;
+  const labs=sorted.map(s=>s[0]),vals=sorted.map(s=>s[1]),cols=sorted.map(s=>UC[s[0]]||'#888');
+  CH.ovnaUpd.data.labels=labs;CH.ovnaUpd.data.datasets[0].data=vals;CH.ovnaUpd.data.datasets[0].backgroundColor=cols;CH.ovnaUpd.update();
+  document.getElementById('ovna-pie-leg').innerHTML=sorted.map(([u,c])=>
+    `<span class="li"><span class="ld" style="background:${UC[u]||'#888'}"></span>${u} ${c}</span>`).join('');
+  document.getElementById('ovnaUpdProg').innerHTML=sorted.map(([u,c])=>`
+    <div class="pi"><span class="plbl">${u}</span>
+    <div class="pbg"><div class="pf" style="width:${(c/total*100).toFixed(0)}%;background:${UC[u]||'#888'};"></div></div>
+    <span class="pc">${c}</span></div>`).join('');
+  // Table
+  document.getElementById('ovnaBody').innerHTML=f.map((x,i)=>`<tr>
+    <td style="color:var(--t4);font-size:12px;">${i+1}</td>
+    <td>${x.dept}</td><td style="font-size:13px;">${x.bp}</td>
+    <td style="font-size:12px;max-width:185px;white-space:normal;line-height:1.5;">${x.proj}</td>
+    <td>${x.house||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.due_last||'—'}</td>
+    <td style="text-align:right;">${x.due_amt||'—'}</td>
+    <td style="text-align:right;">${x.overdue||'—'}</td>
+    <td style="text-align:right;font-weight:700;color:${x.debt?'#DC2626':'var(--t4)'};">${x.debt||'—'}</td>
+    <td><span class="badge ${GB[x.guarantee]||'bgy'}">${x.guarantee||'—'}</span></td>
+    <td style="font-size:12px;">${x.ck_custcare_st||'—'}</td>
+    <td><span class="badge ${UB[x.update]||'bgy'}">${x.update||'—'}</span></td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d01||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d02||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d03||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d04||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d05||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d06||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d07||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d08||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d09||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d10||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
+    <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
+    <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
+    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>
+    </tr>`).join('');
+  // Summary pivot table (สรุปไม่ดำเนินการภาพรวม) — uses same filtered data
+  const ovnaDeps=[...new Set(f.map(x=>x.dept))].sort();
+  const uc=['hw','ho','','hg','hp','ht'];
+  let pvH=`<table id="tOvNAP"><thead><tr><th>กอง</th><th>สาขา</th>`;
+  UU.forEach((u,i)=>pvH+=`<th class="${uc[i]||''}" style="text-align:right;font-size:11px;">${u}</th>`);
+  pvH+=`<th style="text-align:right;background:#C8D9F5;color:#0F2B6F;">รวม</th></tr></thead><tbody>`;
+  ovnaDeps.forEach(dep=>{
+    const dr=f.filter(r=>r.dept===dep),bs=uniq(dr,'bp');
+    bs.forEach((bp,bi)=>{
+      const br=dr.filter(r=>r.bp===bp);
+      pvH+=`<tr><td>${bi===0?dep:''}</td><td style="font-size:13px;">${bp}</td>`;
+      UU.forEach(u=>{const c=br.filter(r=>r.update===u).length;pvH+=`<td class="num">${c||'<span class="z">—</span>'}</td>`;});
+      pvH+=`<td class="num"><strong>${br.length}</strong></td></tr>`;
+    });
+    pvH+=`<tr class="sub"><td colspan="2">รวม ${dep}</td>`;
+    UU.forEach(u=>{const c=dr.filter(r=>r.update===u).length;pvH+=`<td class="num">${c||'—'}</td>`;});
+    pvH+=`<td class="num"><strong>${dr.length}</strong></td></tr>`;
+  });
+  pvH+=`<tr class="grand"><td colspan="2">ผลรวมทั้งหมด</td>`;
+  UU.forEach(u=>{const c=f.filter(r=>r.update===u).length;pvH+=`<td class="num"><strong>${c||'—'}</strong></td>`;});
+  pvH+=`<td class="num"><strong>${f.length}</strong></td></tr></tbody></table>`;
+  document.getElementById('ovnaPvWrap').innerHTML=pvH;
+}
+function ovnaKpiClick(k){
+  if(k==='all'){setV('ovna-dept','');updSel('ovna-bp',uniq(ovnaBase(),'bp'),'');updSel('ovna-proj',uniq(ovnaBase(),'proj'),'');}
+  else{setV('ovna-dept',k);ovnaDeptChange();return;}
+  renOvNA();
+}
+
+// ════════════════════════════════
 // NO ACTION — with KPI cards as filters
 // ════════════════════════════════
 let naUpdFilter='';
@@ -935,6 +1109,15 @@ function initCharts(){
         const cur=getV('mn-upd');
         setV('mn-upd',cur===u?'':u);renMn();
       },onHover(e,els){e.native.target.style.cursor=els.length?'pointer':'default';}}});
+  CH.ovnaUpd=new Chart(document.getElementById('cOvnaUpd'),{type:'doughnut',
+    data:{labels:[],datasets:[{data:[],backgroundColor:[],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},animation:{duration:300},
+      onClick(e,els){
+        if(!els.length)return;
+        const u=CH.ovnaUpd.data.labels[els[0].index];
+        const cur=getV('ovna-upd');
+        setV('ovna-upd',cur===u?'':u);renOvNA();
+      },onHover(e,els){e.native.target.style.cursor=els.length?'pointer':'default';}}});
 }
 
 // ════════════════════════════════
@@ -951,6 +1134,10 @@ function initDDs(){
   updSel('mn-dept',uniq(MN,'dept'),'');updSel('mn-bp',uniq(MN,'bp'),'');
   updSel('mn-proj',uniq(MN,'proj'),'');updSel('mn-upd',uniq(MN,'update'),'');updSel('mn-ck09',uniq(MN,'ck_aging09').filter(Boolean),'');
   updSel('mn-ck',uniq(MN,'ck_custcare_st_grp').filter(Boolean),'');
+  const ob=ovnaBase();
+  updSel('ovna-dept',uniq(ob,'dept'),'');updSel('ovna-bp',uniq(ob,'bp'),'');
+  updSel('ovna-proj',uniq(ob,'proj'),'');updSel('ovna-upd',uniq(ob,'update'),'');updSel('ovna-ck09',uniq(ob,'ck_aging09').filter(Boolean),'');
+  updSel('ovna-ck',uniq(ob,'ck_custcare_st_grp').filter(Boolean),'');
 }
 
 function sw(id,btn){
@@ -1002,7 +1189,7 @@ function exPDF(id,title){
 function ds(){const n=new Date();return `${n.getDate()}-${n.getMonth()+1}-${n.getFullYear()-543}`;}
 
 // Boot
-initCharts();initDDs();renOv();renNA();renMn();
+initCharts();initDDs();renOv();renOvNA();renNA();renMn();
 </script>
 </body>
 </html>
