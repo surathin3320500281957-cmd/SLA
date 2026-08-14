@@ -181,7 +181,6 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>โครงการ:</label><select id="ov-proj" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>การค้ำประกัน:</label><select id="ov-guarantee" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>การซ่อม:</label><select id="ov-confirm" onchange="renOv()"><option value="">ทั้งหมด</option></select>
-    <span style="display:none;"><label>สถานะซ่อมถัดไป:</label><select id="ov-next" onchange="renOv()"><option value="">ทั้งหมด</option></select></span>
     <label>สถานะซ่อมปัจจุบัน:</label><select id="ov-cur" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ov-ck09" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>หนี้ค้าง:</label><select id="ov-debt" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
@@ -449,12 +448,22 @@ const MB={'ลงระบบSLAแล้ว':'bbl','ส่งมอบแล้
 const DC={'มบ.':'#1D5BD8','ตบ.1':'#059669','ตบ.2':'#D97706'};
 const SS=Object.keys(SC), UU=Object.keys(UC);
 const STAGES11=['รับคำร้องแจ้งซ่อม','สำรวจซ่อม','ยืนยันการสำรวจซ่อม','ประมาณราคา','ตรวจสอบและรับรองราคา','อนุมัติสรุปค่าก่อสร้าง','รอการจัดจ้าง','จัดหาผู้รับจ้าง','ดำเนินการซ่อม','ดำเนินการเสร็จสิ้น','ขอเบิกเงินค่าจ้าง'];
-const STAGE_COLORS={'รับคำร้องแจ้งซ่อม':'#F59E0B','สำรวจซ่อม':'#9333EA','ยืนยันการสำรวจซ่อม':'#0891B2','ประมาณราคา':'#0D9488','ตรวจสอบและรับรองราคา':'#D97706','อนุมัติสรุปค่าก่อสร้าง':'#6366F1','รอการจัดจ้าง':'#EAB308','จัดหาผู้รับจ้าง':'#059669','ดำเนินการซ่อม':'#DB2777','ดำเนินการเสร็จสิ้น':'#7C3AED','ขอเบิกเงินค่าจ้าง':'#78716C'};
+const STAGES12=[...STAGES11,'ไม่ดำเนินการ']; // 11 สถานะ + "ไม่ดำเนินการ" สำหรับ filter สถานะซ่อมปัจจุบัน (ov-cur)
+const STAGE_COLORS={'รับคำร้องแจ้งซ่อม':'#F59E0B','สำรวจซ่อม':'#9333EA','ยืนยันการสำรวจซ่อม':'#0891B2','ประมาณราคา':'#0D9488','ตรวจสอบและรับรองราคา':'#D97706','อนุมัติสรุปค่าก่อสร้าง':'#6366F1','รอการจัดจ้าง':'#EAB308','จัดหาผู้รับจ้าง':'#059669','ดำเนินการซ่อม':'#DB2777','ดำเนินการเสร็จสิ้น':'#7C3AED','ขอเบิกเงินค่าจ้าง':'#78716C','ไม่ดำเนินการ':'#DC2626'};
 const CH={};
 
 // ── Helpers ──
 const cb=(a,k)=>{const m={};a.forEach(d=>{m[d[k]]=(m[d[k]]||0)+1;});return m;};
 const uniq=(a,k)=>[...new Set(a.map(d=>d[k]).filter(Boolean))].sort();
+// สถานะซ่อมปัจจุบันของ record: ถ้า update ไม่ตรงกับ 11 สถานะที่กำหนด (รวมถึงกรณีเป็นค่าว่าง) ให้ถือเป็น "ไม่ดำเนินการ"
+const curStage=x=>STAGES11.includes(x.update)?x.update:'ไม่ดำเนินการ';
+// ลำดับสถานะปัจจุบัน (1-11), คืนค่า 0 ถ้าไม่ใช่ 1 ใน 11 สถานะ (กลุ่ม "ไม่ดำเนินการ")
+const stageIdx=x=>STAGES11.indexOf(x.update)+1;
+// วันที่ในคอลัมน์ d01-d11 ให้แสดงเฉพาะที่ <= สถานะปัจจุบันของแถวนั้น ถ้าเกินสถานะปัจจุบันให้ซ่อน (แม้ข้อมูลดิบจะมีอยู่) เพื่อไม่ให้ขัดกับคอลัมน์ "สถานะซ่อมปัจจุบัน"
+const dCell=(x,n)=>n<=stageIdx(x)?(x['d'+String(n).padStart(2,'0')]||'—'):'—';
+// เช็คสถานะซ่อมหลังสุด: ถ้าสถานะปัจจุบันเป็น 1 ใน 11 สถานะ (กำลังซ่อม) ให้ = สถานะปัจจุบันเป๊ะ (ไม่ล้ำหน้า/ไม่ตามหลัง)
+// ถ้าสถานะปัจจุบัน = ไม่ดำเนินการ ใช้ ck_custcare_st_grp เดิมตรงๆ (เคยซ่อม -> ใช้ค่านั้น, ไม่เคย -> "ไม่เคยซ่อม")
+const ckStatus=x=>STAGES11.includes(x.update)?x.update:x.ck_custcare_st_grp;
 function updSel(id,opts,cur){
   const el=document.getElementById(id);if(!el)return;
   const prev=cur!==undefined?cur:el.value;
@@ -515,7 +524,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur');
   const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||x.update===cur)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -532,7 +541,7 @@ function ovBPChange(){
 }
 function ovClear(){
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');
-  setV('ov-guarantee','');setV('ov-confirm','');setV('ov-next','');setV('ov-cur','');
+  setV('ov-guarantee','');setV('ov-confirm','');setV('ov-cur','');
   setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');
   ovStatFilter='';
   updSel('ov-bp',uniq(AF,'bp'),'');
@@ -581,10 +590,10 @@ function renOv(){
   CH.bp.data.datasets[0].backgroundColor=bps.map(x=>(!b||b===x)?'#3B82F699':'#3B82F622');
   CH.bp.update('none');
   // Pie
-  CH.st.data.datasets[0].data=STAGES11.map(s=>f.filter(r=>r.update===s).length);
+  CH.st.data.datasets[0].data=STAGES12.map(s=>f.filter(r=>curStage(r)===s).length);
   CH.st.update();
-  document.getElementById('ov-pie-leg').innerHTML=STAGES11.map(s=>{
-    const c=f.filter(r=>r.update===s).length;
+  document.getElementById('ov-pie-leg').innerHTML=STAGES12.map(s=>{
+    const c=f.filter(r=>curStage(r)===s).length;
     return c?`<span class="li"><span class="ld" style="background:${STAGE_COLORS[s]}"></span>${s} ${c}</span>`:'';
   }).join('');
   // Selection card
@@ -619,44 +628,44 @@ function renOv(){
     <td style="text-align:right;">${x.overdue||'—'}</td>
     <td style="text-align:right;font-weight:700;color:${x.debt?'#DC2626':'var(--t4)'};">${x.debt||'—'}</td>
     <td><span class="badge ${GB[x.guarantee]||'bgy'}">${x.guarantee||'—'}</span></td>
-    <td style="font-size:12px;">${x.ck_custcare_st||'—'}</td>
+    <td style="font-size:12px;">${ckStatus(x)||'—'}</td>
     <td><span class="badge ${CFB[x.confirm_flag]||'bgy'}">${x.confirm_flag||'—'}</span></td>
     <td><span class="badge ${SB[x.update]||'bgy'}" style="border:1px solid #B4D2F5;">${x.update||'—'}</span></td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d01||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d02||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d03||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d04||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d05||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d06||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d07||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d08||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d09||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d10||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,1)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,2)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,3)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,4)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,5)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,6)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,7)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,8)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,9)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,10)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,11)}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
     <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
     </tr>`).join('');
-  // Pivot summary table (ตารางสรุป) — uses same filtered data — 11 สถานะ ตรงกับ d01-d11 (CUSTCARE_STATUS_NAME)
+  // Pivot summary table (ตารางสรุป) — uses same filtered data — 11 สถานะ ตรงกับ d01-d11 (CUSTCARE_STATUS_NAME) + คอลัมน์ "ไม่ดำเนินการ" (ผลรวมของคอลัมน์ = รวม เสมอ)
   const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
   let pvH=`<table id="tPV"><thead><tr><th>กอง</th><th>สาขา</th>`;
-  STAGES11.forEach(s=>pvH+=`<th style="text-align:right;font-size:11px;">${s}</th>`);
+  STAGES12.forEach(s=>pvH+=`<th style="text-align:right;font-size:11px;">${s}</th>`);
   pvH+=`<th style="text-align:right;background:#C8D9F5;color:#0F2B6F;">รวม</th></tr></thead><tbody>`;
   pvDeps.forEach(dep=>{
     const dr=f.filter(r=>r.dept===dep),bs=uniq(dr,'bp');
     bs.forEach((bp,bi)=>{
       const br=dr.filter(r=>r.bp===bp);
       pvH+=`<tr><td>${bi===0?dep:''}</td><td style="font-size:13px;">${bp}</td>`;
-      STAGES11.forEach(s=>{const c=br.filter(r=>r.update===s).length;
+      STAGES12.forEach(s=>{const c=br.filter(r=>curStage(r)===s).length;
         pvH+=`<td class="num">${c||'<span class="z">—</span>'}</td>`;});
       pvH+=`<td class="num"><strong>${br.length}</strong></td></tr>`;
     });
     pvH+=`<tr class="sub"><td colspan="2">รวม ${dep}</td>`;
-    STAGES11.forEach(s=>{const c=dr.filter(r=>r.update===s).length;pvH+=`<td class="num">${c||'—'}</td>`;});
+    STAGES12.forEach(s=>{const c=dr.filter(r=>curStage(r)===s).length;pvH+=`<td class="num">${c||'—'}</td>`;});
     pvH+=`<td class="num"><strong>${dr.length}</strong></td></tr>`;
   });
   pvH+=`<tr class="grand"><td colspan="2">ผลรวมทั้งหมด</td>`;
-  STAGES11.forEach(s=>{const c=f.filter(r=>r.update===s).length;pvH+=`<td class="num"><strong>${c||'—'}</strong></td>`;});
+  STAGES12.forEach(s=>{const c=f.filter(r=>curStage(r)===s).length;pvH+=`<td class="num"><strong>${c||'—'}</strong></td>`;});
   pvH+=`<td class="num"><strong>${f.length}</strong></td></tr></tbody></table>`;
   document.getElementById('pvWrap').innerHTML=pvH;
 }
@@ -1132,8 +1141,8 @@ function initCharts(){
       onClick(e,els){if(!els.length)return;setV('ov-bp',bps[els[0].index]);ovBPChange();},
       onHover(e,els){e.native.target.style.cursor=els.length?'pointer':'default';}}});
   CH.st=new Chart(document.getElementById('cStat'),{type:'doughnut',
-    data:{labels:STAGES11,datasets:[{data:STAGES11.map(s=>AF.filter(x=>x.update===s).length),
-      backgroundColor:STAGES11.map(s=>STAGE_COLORS[s]),borderWidth:2,borderColor:'#fff'}]},
+    data:{labels:STAGES12,datasets:[{data:STAGES12.map(s=>AF.filter(x=>curStage(x)===s).length),
+      backgroundColor:STAGES12.map(s=>STAGE_COLORS[s]),borderWidth:2,borderColor:'#fff'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},animation:{duration:350},
       onClick(e,els){
         if(!els.length)return;
@@ -1174,9 +1183,9 @@ function initCharts(){
 // ════════════════════════════════
 function initDDs(){
   updSel('ov-dept',uniq(AF,'dept'),'');updSel('ov-bp',uniq(AF,'bp'),'');updSel('ov-proj',uniq(AF,'proj'),'');
-  updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');updSel('ov-next',uniq(AF,'next_custcare').filter(Boolean),'');
-  updSel('ov-cur',STAGES11,'');
-  updSel('ov-ck09',uniq(AF,'ck_aging09').filter(Boolean),'');updSel('ov-ck',uniq(AF,'ck_custcare_st_grp').filter(Boolean),'');
+  updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');
+  updSel('ov-cur',STAGES12,'');
+  updSel('ov-ck09',uniq(AF,'ck_aging09').filter(Boolean),'');updSel('ov-ck',[...new Set(AF.map(ckStatus).filter(Boolean))].sort(),'');
   const nb=naBase();
   updSel('na-dept',uniq(nb,'dept'),'');updSel('na-bp',uniq(nb,'bp'),'');
   updSel('na-proj',uniq(nb,'proj'),'');updSel('na-upd',uniq(nb,'update'),'');updSel('na-ck09',uniq(nb,'ck_aging09').filter(Boolean),'');
