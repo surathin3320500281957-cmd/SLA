@@ -708,7 +708,7 @@ function renOv(){
     <td style="font-size:12px;">${ckStatus(x)||'—'}</td>
     <td><span class="badge ${CFB[x.confirm_flag]||'bgy'}">${x.confirm_flag||'—'}</span></td>
     <td style="font-size:12px;">${updSummary(x)||'—'}</td>
-    <td><span class="badge ${SB[x.update]||'bgy'}" style="border:1px solid #B4D2F5;">${x.update||'—'}</span></td>
+    <td><span class="badge ${SB[curStage(x)]||'bgy'}" style="border:1px solid #B4D2F5;">${curStage(x)}</span></td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,1)}</td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,2)}</td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,3)}</td>
