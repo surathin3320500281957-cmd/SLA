@@ -120,6 +120,15 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
 .hlw{background:#FEF3C7;color:#92400E;font-weight:700;border-radius:5px;padding:2px 6px;}
 .z{color:#C8D5E8;}
 .badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:10px;font-weight:600;white-space:nowrap;}
+.chips-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;color:#fff;font-size:13px;font-weight:600;white-space:nowrap;}
+.chip-x{cursor:pointer;opacity:.8;font-weight:800;font-size:14px;line-height:1;padding:0 2px;}
+.chip-x:hover{opacity:1;}
+.chip-purple{background:#7C3AED;}
+.chip-blue{background:#2563EB;}
+.chip-green{background:#059669;}
+.chip-orange{background:#EA580C;}
+.chip-red{background:#DC2626;}
 .bbl{background:#DBEAFE;color:#1E40AF;}.bgr{background:#D1FAE5;color:#065F46;}
 .brd{background:#FEE2E2;color:#991B1B;}.bor{background:#FEF3C7;color:#92400E;}
 .bpu{background:#EDE9FE;color:#5B21B6;}.bgy{background:#F3F4F6;color:#374151;}
@@ -191,6 +200,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <button class="fbtn fbtn-clr" onclick="ovClear()">✕ ล้าง</button>
     <span class="fcnt" id="ov-cnt"></span>
   </div>
+  <div class="chips-row" id="ov-chips"></div>
   <div class="krow k5" id="kRow"></div>
   <div class="cgrid c3">
     <div class="ccard"><div class="ctit">กอง <span class="chint">— คลิก Bar เพื่อ filter</span></div>
@@ -259,6 +269,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <button class="fbtn fbtn-clr" onclick="ovnaClear()">✕ ล้าง</button>
     <span class="fcnt" id="ovna-cnt"></span>
   </div>
+  <div class="chips-row" id="ovna-chips"></div>
   <div class="krow k4" id="ovnaKRow"></div>
   <div class="twocol">
     <div class="ccard"><div class="ctit" style="margin-bottom:8px;">สัดส่วน ปรับสรุปการ UPDATE</div>
@@ -317,6 +328,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <button class="fbtn fbtn-clr" onclick="naClear()">✕ ล้าง</button>
     <span class="fcnt" id="na-cnt"></span>
   </div>
+  <div class="chips-row" id="na-chips"></div>
   <!-- KPI cards for NA tab -->
   <div class="krow k4" id="naKRow"></div>
   <div class="twocol">
@@ -378,6 +390,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <button class="fbtn fbtn-clr" onclick="mnClear()">✕ ล้าง</button>
     <span class="fcnt" id="mn-cnt"></span>
   </div>
+  <div class="chips-row" id="mn-chips"></div>
   <!-- Same structure as NA tab: pie + progress -->
   <div class="twocol">
     <div class="ccard"><div class="ctit" style="margin-bottom:8px;">สัดส่วน ปรับสรุปการ UPDATE <span class="chint">— คลิกได้</span></div>
@@ -472,6 +485,53 @@ const dCell=(x,n)=>n<=stageIdx(x)?(x['d'+String(n).padStart(2,'0')]||'—'):'—
 // เช็คสถานะซ่อมหลังสุด: ถ้าสถานะปัจจุบันเป็น 1 ใน 11 สถานะ (กำลังซ่อม) ให้ = สถานะปัจจุบันเป๊ะ (ไม่ล้ำหน้า/ไม่ตามหลัง)
 // ถ้าสถานะปัจจุบัน = ไม่ดำเนินการ ใช้ ck_custcare_st_grp เดิมตรงๆ (เคยซ่อม -> ใช้ค่านั้น, ไม่เคย -> "ไม่เคยซ่อม")
 const ckStatus=x=>STAGES11.includes(x.update)?x.update:x.ck_custcare_st_grp;
+
+// ── Filter chips (แสดง filter ที่เลือกอยู่เป็น chip สีตามหมวดหมู่ ลบได้ทีละตัว) ──
+const LAG_LABELS={'1-30':'0-30 วัน','31-60':'31-60 วัน','61-90':'61-90 วัน','90+':'เกิน 90 วัน'};
+const CKLAG_LABELS={...LAG_LABELS,'never':'ไม่เคยซ่อม'};
+// cfg: [id-suffix, label, สี, ฟังก์ชันที่เรียกตอนลบ chip นี้ (ชื่อฟังก์ชัน, ไม่ใส่วงเล็บ), ตัวแปลงค่าดิบเป็นข้อความแสดงผล (optional)]
+const OV_CHIP_CFG=[
+  ['dept','กอง','purple','ovDeptChange'],
+  ['bp','สาขา','purple','ovBPChange'],
+  ['proj','โครงการ','purple','renOv'],
+  ['ctype','ประเภทสัญญา','blue','renOv'],
+  ['guarantee','การค้ำประกัน','green','renOv'],
+  ['confirm','การซ่อม','green','renOv'],
+  ['cur','สถานะซ่อมปัจจุบัน','green','renOv'],
+  ['ck','เช็คสถานะซ่อมหลังสุด','green','renOv'],
+  ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green','renOv'],
+  ['debt','หนี้ค้าง','orange','renOv'],
+  ['lag','วันค้างสถานะ','orange','renOv',v=>LAG_LABELS[v]||v],
+  ['cklag','วันค้างสถานะซ่อมหลังสุด','orange','renOv',v=>CKLAG_LABELS[v]||v],
+];
+function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
+  ['dept','กอง','purple',DeptFn],
+  ['bp','สาขา','purple',BPFn],
+  ['proj','โครงการ','purple',RenFn],
+  ['ctype','ประเภทสัญญา','blue',RenFn],
+  ['upd','ปรับสรุปการ UPDATE','green',RenFn],
+  ['ck','เช็คสถานะซ่อมหลังสุด','green',RenFn],
+  ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green',RenFn],
+  ['debt','หนี้ค้าง','orange',RenFn],
+  ['lag','วันค้างสถานะ','orange',RenFn,v=>LAG_LABELS[v]||v],
+  ['cklag','วันค้างสถานะซ่อมหลังสุด','orange',RenFn,v=>CKLAG_LABELS[v]||v],
+];}
+const OVNA_CHIP_CFG=otherChipCfg('ovna','ovnaDeptChange','ovnaBPChange','renOvNA');
+const NA_CHIP_CFG=otherChipCfg('na','naDeptChange','naBPChange','renNA');
+const MN_CHIP_CFG=otherChipCfg('mn','mnDeptChange','mnBPChange','renMn');
+function chipClear(id,fn){setV(id,'');window[fn]();}
+function renderChips(pfx,cfg,containerId,extra){
+  const parts=[];
+  cfg.forEach(([suf,label,color,fn,fmt])=>{
+    const id=`${pfx}-${suf}`,v=getV(id);
+    if(!v)return;
+    const disp=fmt?fmt(v):v;
+    parts.push(`<span class="chip chip-${color}">${label}: ${disp}<span class="chip-x" onclick="chipClear('${id}','${fn}')">✕</span></span>`);
+  });
+  if(extra)parts.push(extra);
+  const el=document.getElementById(containerId);
+  if(el)el.innerHTML=parts.join('');
+}
 function updSel(id,opts,cur){
   const el=document.getElementById(id);if(!el)return;
   const prev=cur!==undefined?cur:el.value;
@@ -564,11 +624,13 @@ function ovKpiClick(stat,fld){
   }
   renOv();
 }
+function ovStatClear(){ovStatFilter='';renOv();}
 function renOv(){
   const f=ovFiltered();
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj');
   document.getElementById('ov-cnt').textContent=`${f.length.toLocaleString()} รายการ`;
   document.getElementById('tb-ov').textContent=AF.length.toLocaleString();
+  renderChips('ov',OV_CHIP_CFG,'ov-chips',ovStatFilter?`<span class="chip chip-red">สถานะ: ${ovStatFilter}<span class="chip-x" onclick="chipClear('','ovStatClear')">✕</span></span>`:'');
   // KPI
   const t=f.length||1;
   const ks=[
@@ -746,6 +808,7 @@ function renOvNA(){
   const t=f.length||1;
   document.getElementById('ovna-cnt').textContent=`แสดง ${f.length} รายการ`;
   document.getElementById('tb-ovna').textContent=ovnaBase().length;
+  renderChips('ovna',OVNA_CHIP_CFG,'ovna-chips');
   // KPI cards — grouped by dept, clickable
   const deps=['มบ.','ตบ.1','ตบ.2'];
   document.getElementById('ovnaKRow').innerHTML=[
@@ -864,6 +927,7 @@ function renNA(){
   const t=f.length||1;
   document.getElementById('na-cnt').textContent=`แสดง ${f.length} รายการ`;
   document.getElementById('tb-na').textContent=naBase().length;
+  renderChips('na',NA_CHIP_CFG,'na-chips');
   // KPI cards — grouped by dept, clickable
   const deps=['มบ.','ตบ.1','ตบ.2'];
   document.getElementById('naKRow').innerHTML=[
@@ -1054,6 +1118,7 @@ function renMn(){
   const t=f.length||1;
   document.getElementById('mn-cnt').textContent=`แสดง ${f.length} จาก ${MN.length} รายการ`;
   document.getElementById('tb-mn').textContent=MN.length;
+  renderChips('mn',MN_CHIP_CFG,'mn-chips');
   // KPI cards — clickable filter by dept
   const deps=['มบ.','ตบ.1','ตบ.2'];
   document.getElementById('mnKRow').innerHTML=[
