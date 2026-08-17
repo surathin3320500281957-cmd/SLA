@@ -194,6 +194,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>สถานะซ่อมปัจจุบัน:</label><select id="ov-cur" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ปรับสรุปการ UPDATE:</label><select id="ov-upd" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ov-ck09" onchange="renOv()"><option value="">ทั้งหมด</option></select>
+    <label>วันค้างทำสัญญา:</label><select id="ov-conlag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>หนี้ค้าง:</label><select id="ov-debt" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
     <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ov-cklag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
@@ -232,7 +233,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th>กอง</th><th>สาขา</th><th>โครงการ</th>
       <th>บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
       <th class="ho">การค้ำประกัน</th>
       <th class="ho">เช็คสถานะซ่อมหลังสุด</th>
       <th class="hw">การซ่อม</th><th class="ho">ปรับสรุปการ UPDATE</th><th class="hi" style="background:#E0EDFF;">สถานะซ่อมปัจจุบัน</th>
@@ -263,6 +264,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ประเภทสัญญา:</label><select id="ovna-ctype" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
     <label>ปรับสรุปการ UPDATE:</label><select id="ovna-upd" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ovna-ck09" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
+    <label>วันค้างทำสัญญา:</label><select id="ovna-conlag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>หนี้ค้าง:</label><select id="ovna-debt" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
     <label>วันค้างสถานะ:</label><select id="ovna-lag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ovna-cklag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
@@ -293,7 +295,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
       <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
       <th class="hg">การค้ำประกัน</th><th class="hg">เช็คสถานะซ่อมหลังสุด</th><th class="ho">ปรับสรุปการ UPDATE</th>
       <th class="hg">รับคำร้องแจ้งซ่อม</th><th class="hg">สำรวจซ่อม</th>
       <th class="hg">ยืนยันการสำรวจซ่อม</th><th class="hg">ประมาณราคา</th>
@@ -322,6 +324,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ประเภทสัญญา:</label><select id="na-ctype" onchange="renNA()"><option value="">ทั้งหมด</option></select>
     <label>ปรับสรุปการ UPDATE:</label><select id="na-upd" onchange="renNA()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="na-ck09" onchange="renNA()"><option value="">ทั้งหมด</option></select>
+    <label>วันค้างทำสัญญา:</label><select id="na-conlag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>หนี้ค้าง:</label><select id="na-debt" onchange="renNA()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
     <label>วันค้างสถานะ:</label><select id="na-lag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="na-cklag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
@@ -353,7 +356,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
       <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
       <th class="hg">การค้ำประกัน</th><th class="hg">เช็คสถานะซ่อมหลังสุด</th><th class="ho">ปรับสรุปการ UPDATE</th>
       <th class="hg">รับคำร้องแจ้งซ่อม</th><th class="hg">สำรวจซ่อม</th>
       <th class="hg">ยืนยันการสำรวจซ่อม</th><th class="hg">ประมาณราคา</th>
@@ -384,6 +387,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ประเภทสัญญา:</label><select id="mn-ctype" onchange="renMn()"><option value="">ทั้งหมด</option></select>
     <label>ปรับสรุปการ UPDATE:</label><select id="mn-upd" onchange="renMn()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="mn-ck09" onchange="renMn()"><option value="">ทั้งหมด</option></select>
+    <label>วันค้างทำสัญญา:</label><select id="mn-conlag" onchange="renMn()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>หนี้ค้าง:</label><select id="mn-debt" onchange="renMn()"><option value="">ทั้งหมด</option><option value="มีหนี้ค้าง">มีหนี้ค้าง</option><option value="ไม่มีหนี้ค้าง">ไม่มีหนี้ค้าง</option></select>
     <label>วันค้างสถานะ:</label><select id="mn-lag" onchange="renMn()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="mn-cklag" onchange="renMn()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
@@ -415,7 +419,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hi">กอง</th><th class="hi">สาขา</th><th class="hi">โครงการ</th>
       <th class="hi">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">Due ล่าสุด</th><th class="ht">เงิน Due</th><th class="ht">งวดค้าง</th><th class="ht" style="color:#DC2626;">หนี้ค้าง</th>
       <th class="hg">การค้ำประกัน</th>
       <th class="hg">เช็คสถานะซ่อมหลังสุด</th>
       <th class="hp">ปรับสรุปการ UPDATE</th>
@@ -492,6 +496,33 @@ const updSummary=x=>STAGES11.includes(x.update)?'':x.update;
 
 // ── Filter chips (แสดง filter ที่เลือกอยู่เป็น chip สีตามหมวดหมู่ ลบได้ทีละตัว) ──
 const LAG_LABELS={'1-30':'0-30 วัน','31-60':'31-60 วัน','61-90':'61-90 วัน','90+':'เกิน 90 วัน'};
+// วันค้างทำสัญญา: จำนวนวันจากวันทำสัญญา (start_con, รูปแบบ DD/MM/YY พ.ศ.) ถึง UPD_REF_DATE
+function parseDMY(str){
+  if(!str)return null;
+  const p=str.split('/');
+  if(p.length!==3)return null;
+  const d=+p[0],m=+p[1],yy=+p[2];
+  if(!d||!m||!yy)return null;
+  return new Date(1957+yy,m-1,d);
+}
+function contractLagDays(x){
+  const dt=parseDMY(x.start_con);
+  if(!dt)return null;
+  const diff=Math.round((UPD_REF_DATE-dt)/86400000);
+  return diff>=0?diff:null;
+}
+function conLagTd(x){
+  const v=contractLagDays(x);
+  if(v===null)return'<td style="text-align:right;color:var(--t4);">—</td>';
+  const color=v>90?'#DC2626':v>60?'#D97706':'#059669';
+  return`<td style="text-align:right;font-weight:700;color:${color};">${v}</td>`;
+}
+// ใช้กับ conlag filter โดยเฉพาะ: ถ้าไม่มีวันทำสัญญาเลย (null) ต้องไม่ถูกนับเข้า bucket 0-30 วัน (ต่างจาก inLagRange เดิมที่ปนค่า null เป็น 0)
+function inLagRangeStrict(v,range){
+  if(!range)return true;
+  if(v===null)return false;
+  return inLagRange(v,range);
+}
 const CKLAG_LABELS={...LAG_LABELS,'never':'ไม่เคยซ่อม'};
 // cfg: [id-suffix, label, สี, ฟังก์ชันที่เรียกตอนลบ chip นี้ (ชื่อฟังก์ชัน, ไม่ใส่วงเล็บ), ตัวแปลงค่าดิบเป็นข้อความแสดงผล (optional)]
 const OV_CHIP_CFG=[
@@ -508,6 +539,7 @@ const OV_CHIP_CFG=[
   ['debt','หนี้ค้าง','orange','renOv'],
   ['lag','วันค้างสถานะ','orange','renOv',v=>LAG_LABELS[v]||v],
   ['cklag','วันค้างสถานะซ่อมหลังสุด','orange','renOv',v=>CKLAG_LABELS[v]||v],
+  ['conlag','วันค้างทำสัญญา','orange','renOv',v=>LAG_LABELS[v]||v],
 ];
 function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
   ['dept','กอง','purple',DeptFn],
@@ -520,6 +552,7 @@ function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
   ['debt','หนี้ค้าง','orange',RenFn],
   ['lag','วันค้างสถานะ','orange',RenFn,v=>LAG_LABELS[v]||v],
   ['cklag','วันค้างสถานะซ่อมหลังสุด','orange',RenFn,v=>CKLAG_LABELS[v]||v],
+  ['conlag','วันค้างทำสัญญา','orange',RenFn,v=>LAG_LABELS[v]||v],
 ];}
 const OVNA_CHIP_CFG=otherChipCfg('ovna','ovnaDeptChange','ovnaBPChange','renOvNA');
 const NA_CHIP_CFG=otherChipCfg('na','naDeptChange','naBPChange','renNA');
@@ -596,8 +629,8 @@ let ovStatFilter='';
 function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
-  const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),conlag=getV('ov-conlag');
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -615,7 +648,7 @@ function ovBPChange(){
 function ovClear(){
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');setV('ov-ctype','');
   setV('ov-guarantee','');setV('ov-confirm','');setV('ov-cur','');setV('ov-upd','');
-  setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');
+  setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');setV('ov-conlag','');
   ovStatFilter='';
   updSel('ov-bp',uniq(AF,'bp'),'');
   updSel('ov-proj',uniq(AF,'proj'),'');
@@ -700,6 +733,7 @@ function renOv(){
     <td style="font-size:12px;">${x.cust||'—'}</td>
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
+    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_last||'—'}</td>
     <td style="text-align:right;">${x.due_amt||'—'}</td>
     <td style="text-align:right;">${x.overdue||'—'}</td>
@@ -786,8 +820,8 @@ const OVNA=AF.filter(x=>x.status==='ไม่ดำเนินการ');
 function ovnaBase(){return OVNA;}
 function ovnaFiltered(){
   const d=getV('ovna-dept'),b=getV('ovna-bp'),p=getV('ovna-proj'),u=getV('ovna-upd'),ct=getV('ovna-ctype');
-  const ck9=getV('ovna-ck09'),debt=getV('ovna-debt'),lag=getV('ovna-lag'),ck=getV('ovna-ck'),cklag=getV('ovna-cklag');
-  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  const ck9=getV('ovna-ck09'),debt=getV('ovna-debt'),lag=getV('ovna-lag'),ck=getV('ovna-ck'),cklag=getV('ovna-cklag'),conlag=getV('ovna-conlag');
+  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function ovnaDeptChange(){
   const d=getV('ovna-dept'),base=d?ovnaBase().filter(x=>x.dept===d):ovnaBase();
@@ -803,7 +837,7 @@ function ovnaBPChange(){
   renOvNA();
 }
 function ovnaClear(){
-  ['ovna-dept','ovna-bp','ovna-proj','ovna-ctype','ovna-upd','ovna-ck09','ovna-debt','ovna-lag','ovna-ck','ovna-cklag'].forEach(id=>setV(id,''));
+  ['ovna-dept','ovna-bp','ovna-proj','ovna-ctype','ovna-upd','ovna-ck09','ovna-debt','ovna-lag','ovna-ck','ovna-cklag','ovna-conlag'].forEach(id=>setV(id,''));
   const ob=ovnaBase();
   updSel('ovna-bp',uniq(ob,'bp'),'');updSel('ovna-proj',uniq(ob,'proj'),'');
   updSel('ovna-upd',uniq(ob,'update'),'');updSel('ovna-ck09',uniq(ob,'ck_aging09').filter(Boolean),'');
@@ -847,6 +881,7 @@ function renOvNA(){
     <td style="font-size:12px;">${x.cust||'—'}</td>
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
+    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_last||'—'}</td>
     <td style="text-align:right;">${x.due_amt||'—'}</td>
     <td style="text-align:right;">${x.overdue||'—'}</td>
@@ -905,8 +940,8 @@ let naUpdFilter='';
 function naBase(){return NA;}
 function naFiltered(){
   const d=getV('na-dept'),b=getV('na-bp'),p=getV('na-proj'),u=getV('na-upd'),ct=getV('na-ctype');
-  const ck9=getV('na-ck09'),debt=getV('na-debt'),lag=getV('na-lag'),ck=getV('na-ck'),cklag=getV('na-cklag');
-  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  const ck9=getV('na-ck09'),debt=getV('na-debt'),lag=getV('na-lag'),ck=getV('na-ck'),cklag=getV('na-cklag'),conlag=getV('na-conlag');
+  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function naDeptChange(){
   const d=getV('na-dept'),base=d?naBase().filter(x=>x.dept===d):naBase();
@@ -922,7 +957,7 @@ function naBPChange(){
   renNA();
 }
 function naClear(){
-  ['na-dept','na-bp','na-proj','na-ctype','na-upd','na-ck09','na-debt','na-lag','na-ck','na-cklag'].forEach(id=>setV(id,''));
+  ['na-dept','na-bp','na-proj','na-ctype','na-upd','na-ck09','na-debt','na-lag','na-ck','na-cklag','na-conlag'].forEach(id=>setV(id,''));
   const nb=naBase();
   updSel('na-bp',uniq(nb,'bp'),'');updSel('na-proj',uniq(nb,'proj'),'');
   updSel('na-upd',uniq(nb,'update'),'');updSel('na-ck09',uniq(nb,'ck_aging09').filter(Boolean),'');
@@ -966,6 +1001,7 @@ function renNA(){
     <td style="font-size:12px;">${x.cust||'—'}</td>
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
+    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_last||'—'}</td>
     <td style="text-align:right;">${x.due_amt||'—'}</td>
     <td style="text-align:right;">${x.overdue||'—'}</td>
@@ -1093,8 +1129,8 @@ function renPV(){
 // ════════════════════════════════
 function mnFiltered(){
   const d=getV('mn-dept'),b=getV('mn-bp'),p=getV('mn-proj'),u=getV('mn-upd'),ct=getV('mn-ctype');
-  const ck9=getV('mn-ck09'),debt=getV('mn-debt'),lag=getV('mn-lag'),ck=getV('mn-ck'),cklag=getV('mn-cklag');
-  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag));
+  const ck9=getV('mn-ck09'),debt=getV('mn-debt'),lag=getV('mn-lag'),ck=getV('mn-ck'),cklag=getV('mn-cklag'),conlag=getV('mn-conlag');
+  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function mnDeptChange(){
   const d=getV('mn-dept'),base=d?MN.filter(x=>x.dept===d):MN;
@@ -1112,7 +1148,7 @@ function mnBPChange(){
 function mnClear(){
   ['mn-dept','mn-bp','mn-proj','mn-ctype','mn-upd'].forEach(id=>setV(id,''));
   updSel('mn-bp',uniq(MN,'bp'),'');updSel('mn-proj',uniq(MN,'proj'),'');
-  setV('mn-debt','');setV('mn-lag','');setV('mn-ck','');setV('mn-cklag','');updSel('mn-upd',uniq(MN,'update'),'');updSel('mn-ck09',uniq(MN,'ck_aging09').filter(Boolean),'');renMn();
+  setV('mn-debt','');setV('mn-lag','');setV('mn-ck','');setV('mn-cklag','');setV('mn-conlag','');updSel('mn-upd',uniq(MN,'update'),'');updSel('mn-ck09',uniq(MN,'ck_aging09').filter(Boolean),'');renMn();
 }
 function mnKpiClick(k){
   if(k==='all'){setV('mn-dept','');updSel('mn-bp',uniq(MN,'bp'),'');updSel('mn-proj',uniq(MN,'proj'),'');}
@@ -1158,6 +1194,7 @@ function renMn(){
     <td style="font-size:12px;">${d.cust||'—'}</td>
     <td style="font-size:12px;">${d.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${d.start_con||'—'}</td>
+    ${conLagTd(d)}
     <td style="font-size:12px;white-space:nowrap;">${d.due_last||'—'}</td>
     <td style="text-align:right;">${d.due_amt||'—'}</td>
     <td style="text-align:right;">${d.overdue||'—'}</td>
