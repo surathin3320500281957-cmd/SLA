@@ -182,7 +182,51 @@ for r in AF/NA/MN: r['contract_type'] = ct_map.get(str(r['cust']), '')
 
 ---
 
-## 8. ประวัติการแก้ไข (สรุปเรียงตามลำดับ)
+## 7.1 ตาราง Mapping เต็ม — Excel column (sheet AF) → JSON field (ใช้ตรงนี้อ้างอิงได้เลย ไม่ต้อง reconstruct ใหม่)
+
+| JSON field | Excel column (sheet AF) | หมายเหตุการแปลง |
+|---|---|---|
+| `dept` | `DEPT_SHORT_NAME` | ตรงตัว |
+| `bp` | `BP_SHORT_NAME` | ตรงตัว |
+| `proj` | `PROJ_NAME` | ตรงตัว |
+| `house` | `HOUSE_NO_ACT` | ⚠️ เช็ค pattern `^\d{4}-\d{2}-\d{2}` ทุกครั้ง (ดูข้อ 5 ในขั้นตอน) |
+| `cust` | `CUST_CODE` | แปลงเป็น string ไม่มีทศนิยม (`str(int(x))`) |
+| `cust_name` | `CUSTNAME1DISPLAY` | ตรงตัว |
+| `change_status` | `CHANGE_STATUS` | ตรงตัว |
+| `status` | `NEXT_CUSTCARE` | ตรงตัว (ไม่ใช่ curStage-grouped) |
+| `update` | coalesce 3 ชั้น | 1) `CUSTCARE_STATUS_NAME` ถ้าไม่ว่าง 2) ไม่งั้น lookup `ปรับสรุปการUPDATE` จาก sheet "สำหรับกรอง-ตรวจสอบ" ด้วย `รหัสลูกค้า`=`cust` 3) ไม่งั้น fallback `NEXT_CUSTCARE` |
+| `guarantee` | `ST_GUARANTEE` | ตรงตัว |
+| `confirm_flag` | `CONFIRM_FLAG` | ตรงตัว |
+| `next_custcare` | `NEXT_CUSTCARE` | เหมือน `status` ทุกประการ (ฟิลด์ซ้ำ ไม่ได้ใช้แล้ว) |
+| `start_con` | `CONTRACT_DATE` | datetime, ปีเก็บเป็น **พ.ศ.ตรงๆ** → format `DD/MM/YY` ด้วย `year%100` |
+| `due_last` | `Dueล่าสุด` | ตัวเลข `YYYYMMDD`, ปีเป็น **ค.ศ.** → `+543` ก่อนแปลง |
+| `due_amt` | `เงินDue` | ตัวเลข → format `{:,.2f}` (comma + ทศนิยม 2 ตำแหน่ง) |
+| `overdue` | `งวดค้าง` | ตัวเลข → string จำนวนเต็ม |
+| `debt` | `หนี้ค้าง` | ตัวเลข → format `{:,.2f}` |
+| `days_lag` | คำนวณ = `REF_DATE - MAX_STATUS_DATE` | `MAX_STATUS_DATE` เป็น `YYYYMMDD` ค.ศ. — **ห้ามใช้ column อื่นแทน** (ไม่ใช่ AGING_XX ตัวใดตัวหนึ่ง) |
+| `ck_custcare_st` | `CK_CUSTCARE_ST` | ข้อความดิบตรงตัว |
+| `ck_custcare_st_grp` | derived จาก `ck_custcare_st` | ตัดวันที่ 8 หลักนำหน้าออก, ว่าง→`"ไม่เคยซ่อม"` |
+| `d01`...`d11` | `DATE_01`...`DATE_11` | datetime, ปีเป็น **ค.ศ.** (ต่างจาก `CONTRACT_DATE`!) → auto-detect `if(y<2100) y+=543` |
+| `aging09` | `AGING_09` | ตัวเลข → string จำนวนเต็ม (ใช้แสดงผลอย่างเดียว ไม่ผูก filter) |
+| `ck_aging09` | `CK_AGING_09` | ข้อความดิบตรงตัว |
+| `contract_type` | `CONTRACT_TYPE1` | ตรงตัว — มีเฉพาะใน sheet AF เท่านั้น |
+
+**NA (จาก sheet "สำหรับกรอง-ตรวจสอบ", ใช้เมื่อรหัสลูกค้าไม่พบใน AF เท่านั้น — ถ้าพบให้ copy record จาก AF ทั้งหมดแทน):**
+
+| JSON field | Excel column | 
+|---|---|
+| `dept`/`bp`/`proj`/`house` | `กอง`/`สำนักงาน`/`โครงการ`/`บ้านเลขที่` |
+| `cust_name` | `ชื่อลูกค้า` |
+| `change_status` | `CHANGE_STATUS` |
+| `confirm_flag` | `CONFIRM_FLAG` |
+| `update`/`status`/`next_custcare` | `ปรับสรุปการUPDATE` (ทั้ง 3 ฟิลด์ใช้ค่าเดียวกัน) |
+| ฟิลด์อื่นทั้งหมด | เว้นว่าง, `ck_custcare_st_grp='ไม่เคยซ่อม'` |
+
+**MN (จาก sheet "รายเดือน-ชน", ใช้เมื่อรหัสลูกค้าไม่พบใน AF เท่านั้น):** เหมือน NA ทุกประการ แต่ `guarantee` ใส่ค่าคงที่ `'หลังค้ำประกัน'` เสมอ (ไม่มีคอลัมน์นี้ใน sheet)
+
+---
+
+
 
 1. ลบ filter "สถานะซ่อมถัดไป" (ov-next) — dead code
 2. เพิ่ม "ไม่ดำเนินการ" เป็นตัวเลือกที่ 12 ใน filter สถานะซ่อมปัจจุบัน (`curStage`, `STAGES12`)
