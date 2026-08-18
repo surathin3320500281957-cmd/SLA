@@ -1345,7 +1345,7 @@ function sw(id,btn){
 // ── Export ──
 function exXL(id,name){
   const t=document.getElementById(id);if(!t)return;
-  const wb=XLSX.utils.book_new(),ws=XLSX.utils.table_to_sheet(t);
+  const wb=XLSX.utils.book_new(),ws=XLSX.utils.table_to_sheet(t,{raw:true});
   XLSX.utils.book_append_sheet(wb,ws,'Sheet1');XLSX.writeFile(wb,`${name}_${ds()}.xlsx`);
 }
 function exPDF(id,title){
