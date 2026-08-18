@@ -490,6 +490,16 @@ const dCell=(x,n)=>n<=stageIdx(x)?(x['d'+String(n).padStart(2,'0')]||'—'):'—
 // เช็คสถานะซ่อมหลังสุด: ถ้าสถานะปัจจุบันเป็น 1 ใน 11 สถานะ (กำลังซ่อม) ให้ = สถานะปัจจุบันเป๊ะ (ไม่ล้ำหน้า/ไม่ตามหลัง)
 // ถ้าสถานะปัจจุบัน = ไม่ดำเนินการ ใช้ ck_custcare_st_grp เดิมตรงๆ (เคยซ่อม -> ใช้ค่านั้น, ไม่เคย -> "ไม่เคยซ่อม")
 const ckStatus=x=>STAGES11.includes(x.update)?x.update:x.ck_custcare_st_grp;
+// วันค้างสถานะ: ข้อมูลดิบ (days_lag) คำนวณจากวันที่ล้ำหน้า 1 สถานะ (pattern เดียวกับ d01-d11/ck_custcare_st)
+// แก้ให้คำนวณจากวันที่ของสถานะปัจจุบันจริง (d0N ตรงกับ stageIdx) แทน ถ้าไม่มีสถานะจริง (กลุ่มไม่ดำเนินการ) ใช้ค่าดิบเดิม
+function statusLagDays(x){
+  const idx=stageIdx(x);
+  if(idx>0){
+    const dt=parseDMY(x['d'+String(idx).padStart(2,'0')]);
+    if(dt)return Math.round((UPD_REF_DATE-dt)/86400000);
+  }
+  return (x.days_lag!==''&&x.days_lag!=null)?Number(x.days_lag):null;
+}
 // ปรับสรุปการ UPDATE: คำชี้แจงจากสาขา (sheet สำหรับกรอง-ตรวจสอบ) มีความหมายเฉพาะกลุ่ม "ไม่ดำเนินการ" เท่านั้น
 // ถ้าสถานะปัจจุบันเป็น 1 ใน 11 สถานะ (กำลังซ่อมจริงแล้ว) ไม่มีคำชี้แจงส่วนนี้ (คืนค่าว่าง)
 const updSummary=x=>STAGES11.includes(x.update)?'':x.update;
@@ -582,8 +592,8 @@ function getV(id){return document.getElementById(id)?.value||'';}
 
 // วันที่อ้างอิงสำหรับคำนวณ "วันค้างสถานะซ่อมหลังสุด" — ตรงกับวันที่ update ข้อมูล (ค.ศ.)
 const UPD_REF_DATE=new Date(2026,7,18); // เดือนใน JS Date เริ่มที่ 0 → 7=สิงหาคม
-function ckLagValue(ck_custcare_st_raw,days_lag){
-  const raw=(ck_custcare_st_raw||'').trim();
+function ckLagValue(x){
+  const raw=(x.ck_custcare_st||'').trim();
   if(!raw)return'ไม่เคยซ่อม';
   const parts=raw.split(' ');
   if(parts.length>=2&&/^\d{8}$/.test(parts[0])){
@@ -591,7 +601,8 @@ function ckLagValue(ck_custcare_st_raw,days_lag){
     const diff=Math.round((UPD_REF_DATE-new Date(y,m-1,d))/86400000);
     return diff>=0?diff:null;
   }
-  return days_lag?Number(days_lag):null;
+  const sl=statusLagDays(x);
+  return sl!==null?sl:null;
 }
 function inCkLagRange(val,range){
   if(!range)return true;
@@ -599,14 +610,14 @@ function inCkLagRange(val,range){
   if(val==='ไม่เคยซ่อม'||val===null||val===undefined)return false;
   return inLagRange(val,range);
 }
-function ckLagInfo(ck_custcare_st_raw,days_lag){
-  const val=ckLagValue(ck_custcare_st_raw,days_lag);
+function ckLagInfo(x){
+  const val=ckLagValue(x);
   if(val==='ไม่เคยซ่อม')return{txt:'ไม่เคยซ่อม',cls:'gy'};
   if(val===null)return{txt:'—',cls:'gy'};
   return{txt:String(val),cls:val>30?'rd':val>14?'or':'gr'};
 }
-function ckLagTd(ck_custcare_st_raw,days_lag){
-  const info=ckLagInfo(ck_custcare_st_raw,days_lag);
+function ckLagTd(x){
+  const info=ckLagInfo(x);
   const colorMap={rd:'#DC2626',or:'#D97706',gr:'#059669',gy:'var(--t4)'};
   return`<td style="text-align:right;font-weight:700;color:${colorMap[info.cls]};font-size:${info.txt==='ไม่เคยซ่อม'?'12px':'inherit'};">${info.txt}</td>`;
 }
@@ -630,7 +641,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
   const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),conlag=getV('ov-conlag');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -756,7 +767,7 @@ function renOv(){
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,11)}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
+    <td style="text-align:right;font-weight:700;color:${statusLagDays(x)>30?'#DC2626':statusLagDays(x)>14?'#D97706':statusLagDays(x)!==null?'#059669':'var(--t4)'}">${statusLagDays(x)!==null?statusLagDays(x):'—'}</td>${ckLagTd(x)}
     </tr>`).join('');
   // Pivot summary table (ตารางสรุป) — uses same filtered data — 11 สถานะ ตรงกับ d01-d11 (CUSTCARE_STATUS_NAME) + คอลัมน์ "ไม่ดำเนินการ" (ผลรวมของคอลัมน์ = รวม เสมอ)
   const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -821,7 +832,7 @@ function ovnaBase(){return OVNA;}
 function ovnaFiltered(){
   const d=getV('ovna-dept'),b=getV('ovna-bp'),p=getV('ovna-proj'),u=getV('ovna-upd'),ct=getV('ovna-ctype');
   const ck9=getV('ovna-ck09'),debt=getV('ovna-debt'),lag=getV('ovna-lag'),ck=getV('ovna-ck'),cklag=getV('ovna-cklag'),conlag=getV('ovna-conlag');
-  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
+  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function ovnaDeptChange(){
   const d=getV('ovna-dept'),base=d?ovnaBase().filter(x=>x.dept===d):ovnaBase();
@@ -902,7 +913,7 @@ function renOvNA(){
     <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
+    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x)}
     </tr>`).join('');
   // Summary pivot table (สรุปไม่ดำเนินการภาพรวม) — uses same filtered data
   const ovnaDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -941,7 +952,7 @@ function naBase(){return NA;}
 function naFiltered(){
   const d=getV('na-dept'),b=getV('na-bp'),p=getV('na-proj'),u=getV('na-upd'),ct=getV('na-ctype');
   const ck9=getV('na-ck09'),debt=getV('na-debt'),lag=getV('na-lag'),ck=getV('na-ck'),cklag=getV('na-cklag'),conlag=getV('na-conlag');
-  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
+  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function naDeptChange(){
   const d=getV('na-dept'),base=d?naBase().filter(x=>x.dept===d):naBase();
@@ -1007,22 +1018,22 @@ function renNA(){
     <td style="text-align:right;">${x.overdue||'—'}</td>
     <td style="text-align:right;font-weight:700;color:${x.debt?'#DC2626':'var(--t4)'};">${x.debt||'—'}</td>
     <td><span class="badge ${GB[x.guarantee]||'bgy'}">${x.guarantee||'—'}</span></td>
-    <td style="font-size:12px;">${x.ck_custcare_st||'—'}</td>
+    <td style="font-size:12px;">${ckStatus(x)||'—'}</td>
     <td><span class="badge ${UB[x.update]||'bgy'}">${x.update||'—'}</span></td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d01||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d02||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d03||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d04||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d05||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d06||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d07||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d08||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d09||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d10||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${x.d11||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,1)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,2)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,3)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,4)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,5)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,6)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,7)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,8)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,9)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,10)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(x,11)}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${x.days_lag>30?'#DC2626':x.days_lag>14?'#D97706':x.days_lag?'#059669':'var(--t4)'}">${x.days_lag||'—'}</td>${ckLagTd(x.ck_custcare_st,x.days_lag)}
+    <td style="text-align:right;font-weight:700;color:${statusLagDays(x)>30?'#DC2626':statusLagDays(x)>14?'#D97706':statusLagDays(x)!==null?'#059669':'var(--t4)'}">${statusLagDays(x)!==null?statusLagDays(x):'—'}</td>${ckLagTd(x)}
     </tr>`).join('');
   // NP summary table (สรุปไม่ดำเนินการ) — uses same filtered data
   const npDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -1130,7 +1141,7 @@ function renPV(){
 function mnFiltered(){
   const d=getV('mn-dept'),b=getV('mn-bp'),p=getV('mn-proj'),u=getV('mn-upd'),ct=getV('mn-ctype');
   const ck9=getV('mn-ck09'),debt=getV('mn-debt'),lag=getV('mn-lag'),ck=getV('mn-ck'),cklag=getV('mn-cklag'),conlag=getV('mn-conlag');
-  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x.ck_custcare_st,x.days_lag),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
+  return MN.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
 }
 function mnDeptChange(){
   const d=getV('mn-dept'),base=d?MN.filter(x=>x.dept===d):MN;
@@ -1200,22 +1211,22 @@ function renMn(){
     <td style="text-align:right;">${d.overdue||'—'}</td>
     <td style="text-align:right;font-weight:700;color:${d.debt?'#DC2626':'var(--t4)'};">${d.debt||'—'}</td>
     <td><span class="badge ${GB[d.guarantee]||'bgy'}">${d.guarantee||'—'}</span></td>
-    <td style="font-size:12px;">${d.ck_custcare_st||'—'}</td>
+    <td style="font-size:12px;">${ckStatus(d)||'—'}</td>
     <td><span class="badge ${MB[d.update]||'bgy'}">${d.update||'—'}</span></td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d01||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d02||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d03||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d04||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d05||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d06||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d07||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d08||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d09||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d10||'—'}</td>
-    <td style="font-size:12px;white-space:nowrap;">${d.d11||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,1)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,2)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,3)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,4)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,5)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,6)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,7)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,8)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,9)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,10)}</td>
+    <td style="font-size:12px;white-space:nowrap;">${dCell(d,11)}</td>
     <td style="text-align:right;font-weight:600;">${d.aging09||'—'}</td>
     <td><span class="badge ${d.ck_aging09?'brd':'bgy'}">${d.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${d.days_lag>30?'#DC2626':d.days_lag>14?'#D97706':d.days_lag?'#059669':'var(--t4)'}">${d.days_lag||'—'}</td>${ckLagTd(d.ck_custcare_st,d.days_lag)}
+    <td style="text-align:right;font-weight:700;color:${statusLagDays(d)>30?'#DC2626':statusLagDays(d)>14?'#D97706':statusLagDays(d)!==null?'#059669':'var(--t4)'}">${statusLagDays(d)!==null?statusLagDays(d):'—'}</td>${ckLagTd(d)}
     </tr>`).join('');
   // MN Summary table (สรุปไม่ดำเนินการเดือนก่อน)
   const mnDeps=[...new Set(f.map(x=>x.dept))].sort();
@@ -1315,10 +1326,10 @@ function initDDs(){
   const nb=naBase();
   updSel('na-dept',uniq(nb,'dept'),'');updSel('na-bp',uniq(nb,'bp'),'');
   updSel('na-proj',uniq(nb,'proj'),'');updSel('na-ctype',uniq(nb,'contract_type').filter(Boolean),'');updSel('na-upd',uniq(nb,'update'),'');updSel('na-ck09',uniq(nb,'ck_aging09').filter(Boolean),'');
-  updSel('na-ck',uniq(nb,'ck_custcare_st_grp').filter(Boolean),'');
+  updSel('na-ck',[...new Set(nb.map(ckStatus).filter(Boolean))].sort(),'');
   updSel('mn-dept',uniq(MN,'dept'),'');updSel('mn-bp',uniq(MN,'bp'),'');
   updSel('mn-proj',uniq(MN,'proj'),'');updSel('mn-ctype',uniq(MN,'contract_type').filter(Boolean),'');updSel('mn-upd',uniq(MN,'update'),'');updSel('mn-ck09',uniq(MN,'ck_aging09').filter(Boolean),'');
-  updSel('mn-ck',uniq(MN,'ck_custcare_st_grp').filter(Boolean),'');
+  updSel('mn-ck',[...new Set(MN.map(ckStatus).filter(Boolean))].sort(),'');
   const ob=ovnaBase();
   updSel('ovna-dept',uniq(ob,'dept'),'');updSel('ovna-bp',uniq(ob,'bp'),'');
   updSel('ovna-proj',uniq(ob,'proj'),'');updSel('ovna-ctype',uniq(ob,'contract_type').filter(Boolean),'');updSel('ovna-upd',uniq(ob,'update'),'');updSel('ovna-ck09',uniq(ob,'ck_aging09').filter(Boolean),'');
