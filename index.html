@@ -81,6 +81,17 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t1);font-
 .c2a{grid-template-columns:1.4fr 1fr;}
 .c2{grid-template-columns:1fr 1fr;}
 .ccard{background:#fff;border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);border:1.5px solid var(--bdr);}
+.acc{margin-bottom:10px;border:1px solid var(--bdr);border-radius:8px;overflow:hidden;}
+.acc-hd{padding:7px 10px;background:#F8FAFC;cursor:pointer;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:space-between;user-select:none;}
+.acc-hd:hover{background:#EFF3F8;}
+.acc-arrow{transition:transform .15s;font-size:10px;}
+.acc.open .acc-arrow{transform:rotate(90deg);}
+.acc-body{display:none;padding:8px 10px;max-height:220px;overflow-y:auto;}
+.acc.open .acc-body{display:block;}
+.acc-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.acc-tbl th{text-align:left;padding:4px 6px;background:#F1F5F9;color:var(--t3);font-weight:600;position:sticky;top:0;}
+.acc-tbl td{padding:4px 6px;border-top:1px solid #F1F5F9;}
+.acc-tbl td:last-child,.acc-tbl th:last-child{text-align:right;}
 .ctit{font-size:14px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
 .chint{font-size:12px;color:var(--t4);font-weight:400;text-transform:none;letter-spacing:0;}
 .leg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
@@ -210,6 +221,12 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <div class="ccard"><div class="ctit">สาขา <span class="chint">— คลิก Bar เพื่อ filter</span></div>
       <div style="position:relative;height:195px;"><canvas id="cBP"></canvas></div></div>
     <div class="ccard"><div class="ctit">สถานะดำเนินงาน</div>
+      <div class="acc" id="ov-ref-acc">
+        <div class="acc-hd" onclick="document.getElementById('ov-ref-acc').classList.toggle('open')">
+          <span>📖 อ้างอิง: สถานะปัจจุบัน → สถานะถัดไป</span><span class="acc-arrow">▶</span>
+        </div>
+        <div class="acc-body"><table class="acc-tbl"><thead><tr><th>#</th><th>สถานะปัจจุบัน (update)</th><th>สถานะถัดไป (next_custcare)</th><th>จำนวน</th></tr></thead><tbody id="ov-ref-body"></tbody></table></div>
+      </div>
       <div class="leg" id="ov-pie-leg"></div>
       <div style="position:relative;height:155px;"><canvas id="cStat"></canvas></div></div>
   </div>
@@ -1316,6 +1333,18 @@ function initCharts(){
 // ════════════════════════════════
 // INIT DROPDOWNS
 // ════════════════════════════════
+// ตารางอ้างอิง สถานะปัจจุบัน -> สถานะถัดไป (คำนวณสดจาก AF ทั้งหมด ไม่ผูก filter)
+function renRefTable(){
+  const rows=STAGES11.map((s,i)=>{
+    const recs=AF.filter(x=>x.update===s);
+    const next=recs.length?recs[0].status:'';
+    const nextDisp=recs.length?(next||'—'):'<span style="color:var(--t4);">(ไม่มีข้อมูลในชุดปัจจุบัน)</span>';
+    return `<tr><td>${i+1}</td><td>${s}</td><td>${nextDisp}</td><td style="text-align:right;">${recs.length}</td></tr>`;
+  });
+  const naRecs=AF.filter(x=>!STAGES11.includes(x.update));
+  rows.push(`<tr style="background:#FEF2F2;"><td>12</td><td>ไม่ดำเนินการ</td><td><span style="color:var(--t4);">(หลากหลาย ดูคอลัมน์ "ปรับสรุปการ UPDATE")</span></td><td style="text-align:right;">${naRecs.length}</td></tr>`);
+  document.getElementById('ov-ref-body').innerHTML=rows.join('');
+}
 function initDDs(){
   updSel('ov-dept',uniq(AF,'dept'),'');updSel('ov-bp',uniq(AF,'bp'),'');updSel('ov-proj',uniq(AF,'proj'),'');
   updSel('ov-ctype',uniq(AF,'contract_type').filter(Boolean),'');
@@ -1385,7 +1414,7 @@ function exPDF(id,title){
 function ds(){const n=new Date();return `${n.getDate()}-${n.getMonth()+1}-${n.getFullYear()-543}`;}
 
 // Boot
-initCharts();initDDs();renOv();renOvNA();renNA();renMn();
+initCharts();initDDs();renRefTable();renOv();renOvNA();renNA();renMn();
 </script>
 </body>
 </html>
