@@ -740,6 +740,23 @@ function statusDonut(key,canvasId,legId,done,total,doneColor,doneLabel){
     (done?`<span class="li"><span class="ld" style="background:${doneColor}"></span>${doneLabel} ${done}</span>`:'')+
     (notDone?`<span class="li"><span class="ld" style="background:#E5E7EB"></span>ยังไม่มี ${notDone}</span>`:'');
 }
+// donut แสดงทุกค่าจริงที่พบในคอลัมน์ (เช่น "ครั้งที่ 2", "นัดหมายแล้ว") แทนการบีบเหลือแค่ มี/ไม่มี — ค่าว่างจัดเป็นหมวด emptyLabel สีเทาคงที่
+const CAT_COLORS=['#1D5BD8','#059669','#D97706','#7C3AED','#DB2777','#0891B2','#65A30D','#EA580C','#4F46E5'];
+function multiDonut(key,canvasId,legId,arr,field,emptyLabel){
+  const counts={};
+  arr.forEach(x=>{const v=x[field]||emptyLabel;counts[v]=(counts[v]||0)+1;});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const labs=sorted.map(s=>s[0]);
+  const vals=sorted.map(s=>s[1]);
+  let ci=0;
+  const cols=labs.map(l=>l===emptyLabel?'#CBD5E1':CAT_COLORS[ci++%CAT_COLORS.length]);
+  if(CH[key])CH[key].destroy();
+  CH[key]=new Chart(document.getElementById(canvasId),{type:'doughnut',
+    data:{labels:labs,datasets:[{data:vals,backgroundColor:cols,borderWidth:2,borderColor:'#fff'}]},
+    options:{plugins:{legend:{display:false}},cutout:'62%'}});
+  document.getElementById(legId).innerHTML=sorted.map(([u,c],i)=>
+    `<span class="li"><span class="ld" style="background:${cols[i]}"></span>${u} ${c}</span>`).join('');
+}
 function updSel(id,opts,cur){
   const el=document.getElementById(id);if(!el)return;
   const prev=cur!==undefined?cur:el.value;
@@ -1287,9 +1304,9 @@ function renZM(){
   document.getElementById('zm-pie-leg').innerHTML=
     (delivered?`<span class="li"><span class="ld" style="background:#DC2626"></span>ยังไม่ส่งมอบ ${delivered}</span>`:'')+
     (done?`<span class="li"><span class="ld" style="background:#059669"></span>ส่งมอบแล้ว ${done}</span>`:'');
-  statusDonut('zmo','cZMO','zm-o-leg',f.filter(x=>x.o_letter).length,f.length,'#1D5BD8','ส่งแล้ว');
-  statusDonut('zmp','cZMP','zm-p-leg',f.filter(x=>x.p_extra).length,f.length,'#D97706','มีข้อมูล');
-  statusDonut('zmq','cZMQ','zm-q-leg',f.filter(x=>x.q_appt).length,f.length,'#7C3AED','นัดแล้ว');
+  multiDonut('zmo','cZMO','zm-o-leg',f,'o_letter','ยังไม่ดำเนินการ');
+  multiDonut('zmp','cZMP','zm-p-leg',f,'p_extra','ยังไม่ดำเนินการ');
+  multiDonut('zmq','cZMQ','zm-q-leg',f,'q_appt','ยังไม่ดำเนินการ');
   const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
   let pvH=`<table id="tZMP"><thead><tr><th>กอง</th><th>สาขา</th><th style="text-align:right;">จำนวนทั้งหมด</th><th style="text-align:right;color:#059669;">ส่งมอบแล้ว</th><th style="text-align:right;color:#1D5BD8;">ส่งจดหมาย</th><th style="text-align:right;color:#D97706;">แจ้งซ่อมเพิ่มเติม</th><th style="text-align:right;color:#7C3AED;">นัดรับมอบ</th></tr></thead><tbody>`;
   pvDeps.forEach(dep=>{
@@ -1390,9 +1407,9 @@ function renRJ(){
   document.getElementById('rj-pie-leg').innerHTML=
     (rjDelivered?`<span class="li"><span class="ld" style="background:#DC2626"></span>ยังไม่ส่งมอบ ${rjDelivered}</span>`:'')+
     (rjDone?`<span class="li"><span class="ld" style="background:#059669"></span>ส่งมอบแล้ว ${rjDone}</span>`:'');
-  statusDonut('rjo','cRJO','rj-o-leg',f.filter(x=>x.o_letter).length,f.length,'#1D5BD8','ส่งแล้ว');
-  statusDonut('rjp','cRJP','rj-p-leg',f.filter(x=>x.p_extra).length,f.length,'#059669','มีข้อมูล');
-  statusDonut('rjq','cRJQ','rj-q-leg',f.filter(x=>x.q_appt).length,f.length,'#7C3AED','นัดแล้ว');
+  multiDonut('rjo','cRJO','rj-o-leg',f,'o_letter','ยังไม่ดำเนินการ');
+  multiDonut('rjp','cRJP','rj-p-leg',f,'p_extra','ยังไม่ดำเนินการ');
+  multiDonut('rjq','cRJQ','rj-q-leg',f,'q_appt','ยังไม่ดำเนินการ');
   const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
   let pvH=`<table id="tRJP"><thead><tr><th>กอง</th><th>สาขา</th><th style="text-align:right;">จำนวนทั้งหมด</th><th style="text-align:right;color:#1D5BD8;">ส่งจดหมาย</th><th style="text-align:right;color:#059669;">ใบตอบรับ</th><th style="text-align:right;color:#7C3AED;">นัดรับมอบ</th></tr></thead><tbody>`;
   pvDeps.forEach(dep=>{
