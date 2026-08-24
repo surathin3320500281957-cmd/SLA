@@ -415,6 +415,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <span class="sep">›</span>
     <label>โครงการ:</label><select id="zm-proj" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="zm-ctype" onchange="renZM()"><option value="">ทั้งหมด</option></select>
+    <label>วันค้างทำสัญญา:</label><select id="zm-conlag" onchange="renZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะส่งมอบ:</label><select id="zm-delivery" onchange="renZM()"><option value="">ทั้งหมด</option><option value="ยังไม่ส่งมอบ">ยังไม่ส่งมอบ</option><option value="ส่งมอบแล้ว">ส่งมอบแล้ว</option></select>
     <label>ส่งจดหมาย:</label><select id="zm-o" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>แจ้งซ่อมเพิ่มเติม:</label><select id="zm-p" onchange="renZM()"><option value="">ทั้งหมด</option></select>
@@ -452,7 +453,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
       <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ชื่อลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
       <th class="hg">หน่วยงานก่อสร้าง</th><th class="hg">การค้ำประกัน</th>
       <th class="hi" style="background:#DCFCE7;">สถานะส่งมอบ</th>
       <th class="ho">ส่งจดหมาย</th><th class="ho">แจ้งซ่อมเพิ่มเติม</th><th class="ho">นัดรับมอบ</th><th class="ho">หมายเหตุ</th>
@@ -472,6 +473,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <span class="sep">›</span>
     <label>โครงการ:</label><select id="rj-proj" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="rj-ctype" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
+    <label>วันค้างทำสัญญา:</label><select id="rj-conlag" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะส่งมอบ:</label><select id="rj-delivery" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="ยังไม่ส่งมอบ">ยังไม่ส่งมอบ</option><option value="ส่งมอบแล้ว">ส่งมอบแล้ว</option></select>
     <label>ส่งจดหมาย:</label><select id="rj-o" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ใบตอบรับ:</label><select id="rj-p" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
@@ -509,7 +511,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
       <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ชื่อลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
+      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
       <th class="hg">หน่วยงานก่อสร้าง</th><th class="hg">การค้ำประกัน</th>
       <th class="ho">ส่งจดหมาย</th><th class="ho">ใบตอบรับ</th><th class="ho">นัดรับมอบ</th><th class="ho">หมายเหตุ</th>
     </tr></thead><tbody id="rjBody"></tbody></table></div>
@@ -1254,8 +1256,8 @@ function naSubCounts(){
 // ── ZM: ดำเนินการเสร็จสิ้น ──
 function zmFiltered(){
   const d=getV('zm-dept'),b=getV('zm-bp'),p=getV('zm-proj'),ct=getV('zm-ctype');
-  const dl=getV('zm-delivery'),o=getV('zm-o'),pp=getV('zm-p'),q=getV('zm-q');
-  return ZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q));
+  const dl=getV('zm-delivery'),o=getV('zm-o'),pp=getV('zm-p'),q=getV('zm-q'),cl=getV('zm-conlag');
+  return ZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl));
 }
 function zmDeptChange(){
   const d=getV('zm-dept');
@@ -1271,7 +1273,7 @@ function zmBPChange(){
   renZM();
 }
 function zmClear(){
-  ['zm-dept','zm-bp','zm-proj','zm-ctype','zm-delivery','zm-o','zm-p','zm-q'].forEach(id=>setV(id,''));
+  ['zm-dept','zm-bp','zm-proj','zm-ctype','zm-delivery','zm-o','zm-p','zm-q','zm-conlag'].forEach(id=>setV(id,''));
   updSel('zm-bp',uniq(ZM,'bp'),'');updSel('zm-proj',uniq(ZM,'proj'),'');
   renZM();
 }
@@ -1284,6 +1286,7 @@ const ZM_CHIP_CFG=[
   ['o','ส่งจดหมาย','orange','renZM'],
   ['p','แจ้งซ่อมเพิ่มเติม','orange','renZM'],
   ['q','นัดรับมอบ','orange','renZM'],
+  ['conlag','วันค้างทำสัญญา','orange','renZM',v=>LAG_LABELS[v]||v],
 ];
 function renZM(){
   const f=zmFiltered();
@@ -1340,6 +1343,7 @@ function renZM(){
     <td style="font-size:12px;">${x.cust_name||'—'}</td>
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
+    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_first||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.due_new||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.change_status||'—'}</td>
@@ -1357,8 +1361,8 @@ function renZM(){
 // ── RJ: รอจัดจ้าง(ประสงค์ขอส่วนลด) ──
 function rjFiltered(){
   const d=getV('rj-dept'),b=getV('rj-bp'),p=getV('rj-proj'),ct=getV('rj-ctype');
-  const dl=getV('rj-delivery'),o=getV('rj-o'),pp=getV('rj-p'),q=getV('rj-q');
-  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q));
+  const dl=getV('rj-delivery'),o=getV('rj-o'),pp=getV('rj-p'),q=getV('rj-q'),cl=getV('rj-conlag');
+  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl));
 }
 function rjDeptChange(){
   const d=getV('rj-dept');
@@ -1374,7 +1378,7 @@ function rjBPChange(){
   renRJ();
 }
 function rjClear(){
-  ['rj-dept','rj-bp','rj-proj','rj-ctype','rj-delivery','rj-o','rj-p','rj-q'].forEach(id=>setV(id,''));
+  ['rj-dept','rj-bp','rj-proj','rj-ctype','rj-delivery','rj-o','rj-p','rj-q','rj-conlag'].forEach(id=>setV(id,''));
   updSel('rj-bp',uniq(RJ,'bp'),'');updSel('rj-proj',uniq(RJ,'proj'),'');
   renRJ();
 }
@@ -1387,6 +1391,7 @@ const RJ_CHIP_CFG=[
   ['o','ส่งจดหมาย','orange','renRJ'],
   ['p','ใบตอบรับ','orange','renRJ'],
   ['q','นัดรับมอบ','orange','renRJ'],
+  ['conlag','วันค้างทำสัญญา','orange','renRJ',v=>LAG_LABELS[v]||v],
 ];
 function renRJ(){
   const f=rjFiltered();
@@ -1440,6 +1445,7 @@ function renRJ(){
     <td style="font-size:12px;">${x.cust_name||'—'}</td>
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
+    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_first||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.due_new||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.change_status||'—'}</td>
