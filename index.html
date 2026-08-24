@@ -426,11 +426,9 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <div class="ccard"><div class="ctit" style="margin-bottom:8px;">สัดส่วน สถานะส่งมอบ (join AF)</div>
       <div class="leg" id="zm-pie-leg"></div>
       <div style="position:relative;height:165px;"><canvas id="cZM"></canvas></div></div>
-    <div class="ccard"><div class="ctit" style="margin-bottom:8px;">จำนวนตามกอง</div>
-      <div class="plist" id="zmProg"></div></div>
+    <div class="ccard"><div class="ctit" style="margin-bottom:8px;">Ranking สาขา — ส่งมอบ / ส่งจดหมาย / แจ้งซ่อมเพิ่มเติม / นัดรับมอบ</div>
+      <div style="position:relative;height:280px;"><canvas id="cZMRank"></canvas></div></div>
   </div>
-  <div class="ccard" style="margin-bottom:16px;"><div class="ctit" style="margin-bottom:8px;">Ranking สาขา — ส่งมอบ / ส่งจดหมาย / แจ้งซ่อมเพิ่มเติม / นัดรับมอบ</div>
-    <div style="position:relative;height:340px;"><canvas id="cZMRank"></canvas></div></div>
   <div class="sec">
     <div class="ebar"><span class="elbl">📤 Export:</span>
       <button class="bex bxl" onclick="exXL('tZMP','สรุปดำเนินการเสร็จสิ้น')">⬇ Excel</button>
@@ -477,11 +475,9 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <div class="ccard"><div class="ctit" style="margin-bottom:8px;">สัดส่วนตามกอง</div>
       <div class="leg" id="rj-pie-leg"></div>
       <div style="position:relative;height:165px;"><canvas id="cRJ"></canvas></div></div>
-    <div class="ccard"><div class="ctit" style="margin-bottom:8px;">จำนวนตามกอง</div>
-      <div class="plist" id="rjProg"></div></div>
+    <div class="ccard"><div class="ctit" style="margin-bottom:8px;">Ranking สาขา — ส่งจดหมาย / ใบตอบรับ / นัดรับมอบ</div>
+      <div style="position:relative;height:280px;"><canvas id="cRJRank"></canvas></div></div>
   </div>
-  <div class="ccard" style="margin-bottom:16px;"><div class="ctit" style="margin-bottom:8px;">Ranking สาขา — ส่งจดหมาย / ใบตอบรับ / นัดรับมอบ</div>
-    <div style="position:relative;height:340px;"><canvas id="cRJRank"></canvas></div></div>
   <div class="sec">
     <div class="ebar"><span class="elbl">📤 Export:</span>
       <button class="bex bxl" onclick="exXL('tRJP','สรุปรอจัดจ้าง')">⬇ Excel</button>
@@ -1200,6 +1196,8 @@ function naSub(n,btn){
   document.querySelectorAll('.na-subview').forEach(v=>v.classList.remove('on'));
   document.querySelectorAll('.subtabbar .stbtn').forEach(b=>b.classList.remove('on'));
   document.getElementById('na-sub'+n).classList.add('on');btn.classList.add('on');
+  if(n===2)renZM();
+  if(n===3)renRJ();
 }
 function naSubCounts(){
   document.getElementById('na-sub-cnt-1').textContent=naBase().length;
@@ -1261,10 +1259,6 @@ function renZM(){
   document.getElementById('zm-pie-leg').innerHTML=
     (delivered?`<span class="li"><span class="ld" style="background:#DC2626"></span>ยังไม่ส่งมอบ ${delivered}</span>`:'')+
     (done?`<span class="li"><span class="ld" style="background:#059669"></span>ส่งมอบแล้ว ${done}</span>`:'');
-  document.getElementById('zmProg').innerHTML=deps.map(d=>{
-    const c=f.filter(x=>x.dept===d).length,t=f.length||1;
-    return c?`<div class="prow"><span class="plbl">${d}</span><div class="pbar"><div class="pfill" style="width:${c/t*100}%;background:#1D5BD8;"></div></div><span class="pval">${c}</span></div>`:'';
-  }).join('');
   // Ranking bar chart ตามสาขา — ส่งมอบ/ส่งจดหมาย/แจ้งซ่อมเพิ่มเติม/นัดรับมอบ
   const zmBps=[...new Set(f.map(x=>x.bp))];
   const zmRankData=zmBps.map(bp=>{
@@ -1372,10 +1366,6 @@ function renRJ(){
   document.getElementById('rj-pie-leg').innerHTML=deps.map((d,i)=>{
     const c=f.filter(x=>x.dept===d).length;
     return c?`<span class="li"><span class="ld" style="background:${dcolors[i]}"></span>${d} ${c}</span>`:'';
-  }).join('');
-  document.getElementById('rjProg').innerHTML=deps.map(d=>{
-    const c=f.filter(x=>x.dept===d).length,t=f.length||1;
-    return c?`<div class="prow"><span class="plbl">${d}</span><div class="pbar"><div class="pfill" style="width:${c/t*100}%;background:#EA580C;"></div></div><span class="pval">${c}</span></div>`:'';
   }).join('');
   // Ranking bar chart ตามสาขา — ส่งจดหมาย/ใบตอบรับ/นัดรับมอบ
   const rjBps=[...new Set(f.map(x=>x.bp))];
