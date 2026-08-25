@@ -220,6 +220,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ov-cklag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="ov-ck" onchange="renOv()"><option value="">ทั้งหมด</option></select>
+    <label>หมายเหตุ:</label><select id="ov-note" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหมายเหตุ">มีหมายเหตุ</option><option value="ไม่มีหมายเหตุ">ไม่มีหมายเหตุ</option></select>
     <button class="fbtn fbtn-clr" onclick="ovClear()">✕ ล้าง</button>
     <span class="fcnt" id="ov-cnt"></span>
   </div>
@@ -297,6 +298,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>วันค้างสถานะ:</label><select id="ovna-lag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ovna-cklag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="ovna-ck" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
+    <label>หมายเหตุ:</label><select id="ovna-note" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="มีหมายเหตุ">มีหมายเหตุ</option><option value="ไม่มีหมายเหตุ">ไม่มีหมายเหตุ</option></select>
     <button class="fbtn fbtn-clr" onclick="ovnaClear()">✕ ล้าง</button>
     <span class="fcnt" id="ovna-cnt"></span>
   </div>
@@ -827,8 +829,8 @@ let ovStatFilter='';
 function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
-  const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),conlag=getV('ov-conlag');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
+  const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),conlag=getV('ov-conlag'),note=getV('ov-note');
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -846,7 +848,7 @@ function ovBPChange(){
 function ovClear(){
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');setV('ov-ctype','');
   setV('ov-guarantee','');setV('ov-confirm','');setV('ov-cur','');setV('ov-upd','');
-  setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');setV('ov-conlag','');
+  setV('ov-ck09','');setV('ov-debt','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');setV('ov-conlag','');setV('ov-note','');
   ovStatFilter='';
   updSel('ov-bp',uniq(AF,'bp'),'');
   updSel('ov-proj',uniq(AF,'proj'),'');
@@ -1019,8 +1021,8 @@ const OVNA=AF.filter(x=>x.status==='ไม่ดำเนินการ');
 function ovnaBase(){return OVNA;}
 function ovnaFiltered(){
   const d=getV('ovna-dept'),b=getV('ovna-bp'),p=getV('ovna-proj'),u=getV('ovna-upd'),ct=getV('ovna-ctype');
-  const ck9=getV('ovna-ck09'),debt=getV('ovna-debt'),lag=getV('ovna-lag'),ck=getV('ovna-ck'),cklag=getV('ovna-cklag'),conlag=getV('ovna-conlag');
-  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag));
+  const ck9=getV('ovna-ck09'),debt=getV('ovna-debt'),lag=getV('ovna-lag'),ck=getV('ovna-ck'),cklag=getV('ovna-cklag'),conlag=getV('ovna-conlag'),note=getV('ovna-note');
+  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
 }
 function ovnaDeptChange(){
   const d=getV('ovna-dept'),base=d?ovnaBase().filter(x=>x.dept===d):ovnaBase();
@@ -1036,7 +1038,7 @@ function ovnaBPChange(){
   renOvNA();
 }
 function ovnaClear(){
-  ['ovna-dept','ovna-bp','ovna-proj','ovna-ctype','ovna-upd','ovna-ck09','ovna-debt','ovna-lag','ovna-ck','ovna-cklag','ovna-conlag'].forEach(id=>setV(id,''));
+  ['ovna-dept','ovna-bp','ovna-proj','ovna-ctype','ovna-upd','ovna-ck09','ovna-debt','ovna-lag','ovna-ck','ovna-cklag','ovna-conlag','ovna-note'].forEach(id=>setV(id,''));
   const ob=ovnaBase();
   updSel('ovna-bp',uniq(ob,'bp'),'');updSel('ovna-proj',uniq(ob,'proj'),'');
   updSel('ovna-upd',uniq(ob,'update'),'');updSel('ovna-ck09',uniq(ob,'ck_aging09').filter(Boolean),'');
