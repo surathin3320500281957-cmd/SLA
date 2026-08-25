@@ -269,8 +269,8 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg">ยืนยันการสำรวจซ่อม</th><th class="hg">ประมาณราคา</th>
       <th class="hg">ตรวจสอบและรับรองราคา</th><th class="hg">อนุมัติสรุปค่าก่อสร้าง</th>
       <th class="hg">รอการจัดจ้าง</th><th class="hg">จัดหาผู้รับจ้าง</th>
-      <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
-      <th class="hg">ขอเบิกเงินค่าจ้าง</th>
+      <th class="hg">ดำเนินการซ่อม</th><th class="hg" style="background:#EDE9FE;border-left:2px solid #7C3AED;">ดำเนินการเสร็จสิ้น</th>
+      <th class="hg" style="background:#EDE9FE;border-right:2px solid #7C3AED;">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
       <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
       <th class="ho">หมายเหตุ</th>
@@ -331,8 +331,8 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg">ยืนยันการสำรวจซ่อม</th><th class="hg">ประมาณราคา</th>
       <th class="hg">ตรวจสอบและรับรองราคา</th><th class="hg">อนุมัติสรุปค่าก่อสร้าง</th>
       <th class="hg">รอการจัดจ้าง</th><th class="hg">จัดหาผู้รับจ้าง</th>
-      <th class="hg">ดำเนินการซ่อม</th><th class="hg">ดำเนินการเสร็จสิ้น</th>
-      <th class="hg">ขอเบิกเงินค่าจ้าง</th>
+      <th class="hg">ดำเนินการซ่อม</th><th class="hg" style="background:#EDE9FE;border-left:2px solid #7C3AED;">ดำเนินการเสร็จสิ้น</th>
+      <th class="hg" style="background:#EDE9FE;border-right:2px solid #7C3AED;">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
       <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
       <th class="ho">หมายเหตุ</th>
@@ -636,6 +636,7 @@ const DC={'มบ.':'#1D5BD8','ตบ.1':'#059669','ตบ.2':'#D97706'};
 const SS=Object.keys(SC), UU=Object.keys(UC);
 const STAGES11=['รับคำร้องแจ้งซ่อม','สำรวจซ่อม','ยืนยันการสำรวจซ่อม','ประมาณราคา','ตรวจสอบและรับรองราคา','อนุมัติสรุปค่าก่อสร้าง','รอการจัดจ้าง','จัดหาผู้รับจ้าง','ดำเนินการซ่อม','ดำเนินการเสร็จสิ้น','ขอเบิกเงินค่าจ้าง'];
 const STAGES12=[...STAGES11,'ไม่ดำเนินการ']; // 11 สถานะ + "ไม่ดำเนินการ" สำหรับ filter สถานะซ่อมปัจจุบัน (ov-cur)
+const DONE_MERGED='เสร็จสิ้น (รวม)'; // ตัวเลือกที่ 13 ใน ov-cur: รวม "ดำเนินการเสร็จสิ้น" + "ขอเบิกเงินค่าจ้าง" (ในทางปฏิบัติถือว่าเสร็จเหมือนกัน แต่เก็บข้อมูลแยก)
 const STAGE_COLORS={'รับคำร้องแจ้งซ่อม':'#F59E0B','สำรวจซ่อม':'#9333EA','ยืนยันการสำรวจซ่อม':'#0891B2','ประมาณราคา':'#0D9488','ตรวจสอบและรับรองราคา':'#D97706','อนุมัติสรุปค่าก่อสร้าง':'#6366F1','รอการจัดจ้าง':'#EAB308','จัดหาผู้รับจ้าง':'#059669','ดำเนินการซ่อม':'#DB2777','ดำเนินการเสร็จสิ้น':'#7C3AED','ขอเบิกเงินค่าจ้าง':'#78716C','ไม่ดำเนินการ':'#DC2626'};
 const CH={};
 
@@ -831,7 +832,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
   const ck9=getV('ov-ck09'),debt=getV('ov-debt'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),conlag=getV('ov-conlag'),note=getV('ov-note');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||curStage(x)===cur)&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
+  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&(!debt||(debt==='มีหนี้ค้าง'?Boolean(x.debt):!x.debt))&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&inLagRangeStrict(contractLagDays(x),conlag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -877,7 +878,7 @@ function renOv(){
     {i:'⚠️',l:'ไม่ดำเนินการ',s:'ไม่ดำเนินการ',fld:'status',v:f.filter(x=>x.status==='ไม่ดำเนินการ').length,p:`${(f.filter(x=>x.status==='ไม่ดำเนินการ').length/t*100).toFixed(1)}% ⚠`,c:'#DC2626'},
     {i:'🔧',l:'ดำเนินการซ่อม',s:'ดำเนินการซ่อม',fld:'update',v:f.filter(x=>x.update==='ดำเนินการซ่อม').length,p:`${(f.filter(x=>x.update==='ดำเนินการซ่อม').length/t*100).toFixed(1)}%`,c:'#059669'},
     {i:'📦',l:'รอการจัดจ้าง',s:'รอการจัดจ้าง',fld:'update',v:f.filter(x=>x.update==='รอการจัดจ้าง').length,p:`${(f.filter(x=>x.update==='รอการจัดจ้าง').length/t*100).toFixed(1)}%`,c:'#D97706'},
-    {i:'🏁',l:'เสร็จสิ้น',s:'ดำเนินการเสร็จสิ้น',fld:'update',v:f.filter(x=>x.update==='ดำเนินการเสร็จสิ้น').length,p:`${(f.filter(x=>x.update==='ดำเนินการเสร็จสิ้น').length/t*100).toFixed(1)}%`,c:'#7C3AED'},
+    {i:'🏁',l:'เสร็จสิ้น (รวม)',s:DONE_MERGED,fld:'update',v:f.filter(x=>x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง').length,p:`${(f.filter(x=>x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง').length/t*100).toFixed(1)}%`,c:'#7C3AED'},
   ];
   document.getElementById('kRow').innerHTML=ks.map(k=>{
     const isSel=k.fld==='status'?ovStatFilter===k.s:(k.fld==='update'?getV('ov-cur')===k.s:false);
@@ -953,8 +954,8 @@ function renOv(){
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,7)}</td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,8)}</td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,9)}</td>
-    <td style="font-size:12px;white-space:nowrap;">${dCell(x,10)}</td>
-    <td style="font-size:12px;white-space:nowrap;">${dCell(x,11)}</td>
+    <td style="font-size:12px;white-space:nowrap;background:#F5F3FF;border-left:2px solid #DDD6FE;">${dCell(x,10)}</td>
+    <td style="font-size:12px;white-space:nowrap;background:#F5F3FF;border-right:2px solid #DDD6FE;">${dCell(x,11)}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
     <td style="text-align:right;font-weight:700;color:${statusLagDays(x)>30?'#DC2626':statusLagDays(x)>14?'#D97706':statusLagDays(x)!==null?'#059669':'var(--t4)'}">${statusLagDays(x)!==null?statusLagDays(x):'—'}</td>${ckLagTd(x)}
@@ -962,9 +963,14 @@ function renOv(){
     </tr>`).join('');
   // Pivot summary table (ตารางสรุป) — uses same filtered data — 11 สถานะ ตรงกับ d01-d11 (CUSTCARE_STATUS_NAME) + คอลัมน์ "ไม่ดำเนินการ" (ผลรวมของคอลัมน์ = รวม เสมอ)
   const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
-  let pvH=`<table id="tPV"><thead><tr><th>กอง</th><th>สาขา</th>`;
-  STAGES12.forEach(s=>pvH+=`<th style="text-align:right;font-size:11px;">${s}</th>`);
-  pvH+=`<th style="text-align:right;background:#C8D9F5;color:#0F2B6F;">รวม</th></tr></thead><tbody>`;
+  let pvRow1=`<th rowspan="2">กอง</th><th rowspan="2">สาขา</th>`,pvRow2='';
+  STAGES12.forEach((s,si)=>{
+    if(si===9){pvRow1+=`<th colspan="2" style="text-align:center;background:#EDE9FE;color:#5B21B6;">เสร็จสิ้น (รวม)</th>`;pvRow2+=`<th style="text-align:right;font-size:11px;background:#F5F3FF;">${s}</th>`;}
+    else if(si===10){pvRow2+=`<th style="text-align:right;font-size:11px;background:#F5F3FF;">${s}</th>`;}
+    else{pvRow1+=`<th rowspan="2" style="text-align:right;font-size:11px;">${s}</th>`;}
+  });
+  pvRow1+=`<th rowspan="2" style="text-align:right;background:#C8D9F5;color:#0F2B6F;">รวม</th>`;
+  let pvH=`<table id="tPV"><thead><tr>${pvRow1}</tr><tr>${pvRow2}</tr></thead><tbody>`;
   pvDeps.forEach(dep=>{
     const dr=f.filter(r=>r.dept===dep),bs=uniq(dr,'bp');
     bs.forEach((bp,bi)=>{
@@ -1221,8 +1227,8 @@ function renNA(){
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,7)}</td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,8)}</td>
     <td style="font-size:12px;white-space:nowrap;">${dCell(x,9)}</td>
-    <td style="font-size:12px;white-space:nowrap;">${dCell(x,10)}</td>
-    <td style="font-size:12px;white-space:nowrap;">${dCell(x,11)}</td>
+    <td style="font-size:12px;white-space:nowrap;background:#F5F3FF;border-left:2px solid #DDD6FE;">${dCell(x,10)}</td>
+    <td style="font-size:12px;white-space:nowrap;background:#F5F3FF;border-right:2px solid #DDD6FE;">${dCell(x,11)}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
     <td style="text-align:right;font-weight:700;color:${statusLagDays(x)>30?'#DC2626':statusLagDays(x)>14?'#D97706':statusLagDays(x)!==null?'#059669':'var(--t4)'}">${statusLagDays(x)!==null?statusLagDays(x):'—'}</td>${ckLagTd(x)}
@@ -1751,6 +1757,7 @@ function initDDs(){
   updSel('ov-ctype',uniq(AF,'contract_type').filter(Boolean),'');
   updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');
   updSel('ov-cur',STAGES12,'');
+  {const opt=document.createElement('option');opt.value=DONE_MERGED;opt.textContent=DONE_MERGED;document.getElementById('ov-cur').appendChild(opt);}
   updSel('ov-upd',[...new Set(AF.map(updSummary).filter(Boolean))].sort(),'');
   updSel('ov-ck09',uniq(AF,'ck_aging09').filter(Boolean),'');updSel('ov-ck',[...new Set(AF.map(ckStatus).filter(Boolean))].sort(),'');
   const nb=naBase();
