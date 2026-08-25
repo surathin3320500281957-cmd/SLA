@@ -711,6 +711,7 @@ const OV_CHIP_CFG=[
   ['lag','วันค้างสถานะ','orange','renOv',v=>LAG_LABELS[v]||v],
   ['cklag','วันค้างสถานะซ่อมหลังสุด','orange','renOv',v=>CKLAG_LABELS[v]||v],
   ['conlag','วันค้างทำสัญญา','orange','renOv',v=>LAG_LABELS[v]||v],
+  ['note','หมายเหตุ','blue','renOv'],
 ];
 function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
   ['dept','กอง','purple',DeptFn],
@@ -725,7 +726,7 @@ function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
   ['cklag','วันค้างสถานะซ่อมหลังสุด','orange',RenFn,v=>CKLAG_LABELS[v]||v],
   ['conlag','วันค้างทำสัญญา','orange',RenFn,v=>LAG_LABELS[v]||v],
 ];}
-const OVNA_CHIP_CFG=otherChipCfg('ovna','ovnaDeptChange','ovnaBPChange','renOvNA');
+const OVNA_CHIP_CFG=[...otherChipCfg('ovna','ovnaDeptChange','ovnaBPChange','renOvNA'),['note','หมายเหตุ','blue','renOvNA']];
 const NA_CHIP_CFG=[...otherChipCfg('na','naDeptChange','naBPChange','renNA'),['note','หมายเหตุ','blue','renNA',v=>v==='has'?'มีหมายเหตุ':'ไม่มีหมายเหตุ']];
 const MN_CHIP_CFG=otherChipCfg('mn','mnDeptChange','mnBPChange','renMn');
 function chipClear(id,fn){setV(id,'');window[fn]();}
