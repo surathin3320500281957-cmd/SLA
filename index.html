@@ -756,6 +756,41 @@ function statusDonut(key,canvasId,legId,done,total,doneColor,doneLabel){
 }
 // donut แสดงทุกค่าจริงที่พบในคอลัมน์ (เช่น "ครั้งที่ 2", "นัดหมายแล้ว") แทนการบีบเหลือแค่ มี/ไม่มี — ค่าว่างจัดเป็นหมวด emptyLabel สีเทาคงที่
 const CAT_COLORS=['#1D5BD8','#059669','#D97706','#7C3AED','#DB2777','#0891B2','#65A30D','#EA580C','#4F46E5'];
+// ตารางสรุปแบบ grouped-column: 1 กลุ่ม = 1 field (เดิมเคยเป็น donut) แต่ตัดสัดส่วนตาม กอง/สาขา — คอลัมน์ย่อยสร้างจากค่าที่ "พบจริง" ในข้อมูล ไม่ hardcode ชื่อค่า เพื่อไม่ให้ค่าใหม่ที่โผล่มาในอนาคต (เช่น "ครั้งที่ 3") หายไปเงียบๆ
+function catVals(arr,field,emptyLabel){
+  const set=new Set();
+  arr.forEach(x=>set.add(x[field]||emptyLabel));
+  const vals=[...set].filter(v=>v!==emptyLabel).sort();
+  if(set.has(emptyLabel))vals.push(emptyLabel);
+  return vals;
+}
+function buildGroupedSummary(tableId,arr,groups){
+  const deps=[...new Set(arr.map(x=>x.dept))].sort();
+  const gcols=groups.map(g=>({...g,vals:catVals(arr,g.field,g.emptyLabel)}));
+  let row1=`<th rowspan="2">กอง</th><th rowspan="2">สาขา</th><th rowspan="2" style="text-align:right;background:#C8D9F5;color:#0F2B6F;">จำนวนทั้งหมด</th>`,row2='';
+  gcols.forEach(g=>{
+    row1+=`<th colspan="${g.vals.length}" style="text-align:center;background:${g.color.header};color:#fff;">${g.label}</th>`;
+    g.vals.forEach(v=>row2+=`<th style="text-align:right;font-size:11px;background:${g.color.sub};">${v}</th>`);
+  });
+  const cellCounts=(rows)=>gcols.map(g=>g.vals.map(v=>rows.filter(x=>(x[g.field]||g.emptyLabel)===v).length)).flat();
+  let h=`<table id="${tableId}"><thead><tr>${row1}</tr><tr>${row2}</tr></thead><tbody>`;
+  deps.forEach(dep=>{
+    const dr=arr.filter(x=>x.dept===dep),bs=uniq(dr,'bp');
+    bs.forEach((bp,bi)=>{
+      const br=dr.filter(x=>x.bp===bp);
+      h+=`<tr><td>${bi===0?dep:''}</td><td style="font-size:13px;">${bp}</td><td class="num">${br.length}</td>`;
+      h+=cellCounts(br).map(c=>`<td class="num">${c||'<span class="z">—</span>'}</td>`).join('');
+      h+='</tr>';
+    });
+    h+=`<tr class="sub"><td colspan="2">รวม ${dep}</td><td class="num"><strong>${dr.length}</strong></td>`;
+    h+=cellCounts(dr).map(c=>`<td class="num">${c||'—'}</td>`).join('');
+    h+='</tr>';
+  });
+  h+=`<tr class="grand"><td colspan="2">ผลรวมทั้งหมด</td><td class="num"><strong>${arr.length}</strong></td>`;
+  h+=cellCounts(arr).map(c=>`<td class="num"><strong>${c||'—'}</strong></td>`).join('');
+  h+='</tr></tbody></table>';
+  return h;
+}
 function multiDonut(key,canvasId,legId,arr,field,emptyLabel){
   const counts={};
   arr.forEach(x=>{const v=x[field]||emptyLabel;counts[v]=(counts[v]||0)+1;});
@@ -1330,30 +1365,13 @@ function renZM(){
   multiDonut('zmo','cZMO','zm-o-leg',f,'o_letter','ยังไม่ดำเนินการ');
   multiDonut('zmp','cZMP','zm-p-leg',f,'p_extra','ยังไม่ดำเนินการ');
   multiDonut('zmq','cZMQ','zm-q-leg',f,'q_appt','ยังไม่ดำเนินการ');
-  const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
-  let pvH=`<table id="tZMP"><thead><tr><th>กอง</th><th>สาขา</th><th style="text-align:right;background:#C8D9F5;color:#0F2B6F;">จำนวนทั้งหมด</th><th class="hg" style="text-align:right;">ส่งมอบแล้ว</th><th class="ht" style="text-align:right;">ส่งจดหมาย</th><th class="ho" style="text-align:right;">แจ้งซ่อมเพิ่มเติม</th><th class="hp" style="text-align:right;">นัดรับมอบ</th></tr></thead><tbody>`;
-  pvDeps.forEach(dep=>{
-    const dr=f.filter(r=>r.dept===dep),bs=uniq(dr,'bp');
-    bs.forEach((bp,bi)=>{
-      const br=dr.filter(r=>r.bp===bp);
-      pvH+=`<tr><td>${bi===0?dep:''}</td><td style="font-size:13px;">${bp}</td><td class="num">${br.length}</td>
-        <td class="num">${br.filter(x=>x.delivery_status==='ส่งมอบแล้ว').length||'—'}</td>
-        <td class="num">${br.filter(x=>x.o_letter).length||'—'}</td>
-        <td class="num">${br.filter(x=>x.p_extra).length||'—'}</td>
-        <td class="num">${br.filter(x=>x.q_appt).length||'—'}</td></tr>`;
-    });
-    pvH+=`<tr class="sub"><td colspan="2">รวม ${dep}</td><td class="num"><strong>${dr.length}</strong></td>
-      <td class="num">${dr.filter(x=>x.delivery_status==='ส่งมอบแล้ว').length||'—'}</td>
-      <td class="num">${dr.filter(x=>x.o_letter).length||'—'}</td>
-      <td class="num">${dr.filter(x=>x.p_extra).length||'—'}</td>
-      <td class="num">${dr.filter(x=>x.q_appt).length||'—'}</td></tr>`;
-  });
-  pvH+=`<tr class="grand"><td colspan="2">ผลรวมทั้งหมด</td><td class="num"><strong>${f.length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.delivery_status==='ส่งมอบแล้ว').length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.o_letter).length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.p_extra).length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.q_appt).length}</strong></td></tr></tbody></table>`;
-  document.getElementById('zmpWrap').innerHTML=pvH;
+  const ZM_GROUPS=[
+    {label:'ส่งจดหมาย',field:'o_letter',emptyLabel:'ยังไม่ดำเนินการ',color:{header:'#059669',sub:'#ECFDF5'}},
+    {label:'แจ้งซ่อมเพิ่มเติม',field:'p_extra',emptyLabel:'ยังไม่ดำเนินการ',color:{header:'#2563EB',sub:'#EFF6FF'}},
+    {label:'นัดรับมอบ',field:'q_appt',emptyLabel:'ยังไม่ดำเนินการ',color:{header:'#B45309',sub:'#FFFBEB'}},
+    {label:'สถานะส่งมอบ',field:'delivery_status',emptyLabel:'ไม่ระบุ',color:{header:'#0891B2',sub:'#ECFEFF'}},
+  ];
+  document.getElementById('zmpWrap').innerHTML=buildGroupedSummary('tZMP',f,ZM_GROUPS);
   document.getElementById('zmBody').innerHTML=f.map((x,i)=>`<tr>
     <td style="color:var(--t4);font-size:12px;">${i+1}</td>
     <td>${x.dept}</td><td style="font-size:13px;">${x.bp}</td>
@@ -1436,27 +1454,13 @@ function renRJ(){
   multiDonut('rjo','cRJO','rj-o-leg',f,'o_letter','ยังไม่ดำเนินการ');
   multiDonut('rjp','cRJP','rj-p-leg',f,'p_extra','ยังไม่ดำเนินการ');
   multiDonut('rjq','cRJQ','rj-q-leg',f,'q_appt','ยังไม่ดำเนินการ');
-  const pvDeps=[...new Set(f.map(x=>x.dept))].sort();
-  let pvH=`<table id="tRJP"><thead><tr><th>กอง</th><th>สาขา</th><th style="text-align:right;background:#C8D9F5;color:#0F2B6F;">จำนวนทั้งหมด</th><th class="ht" style="text-align:right;">ส่งจดหมาย</th><th class="hg" style="text-align:right;">ใบตอบรับ</th><th class="hp" style="text-align:right;">นัดรับมอบ</th></tr></thead><tbody>`;
-  pvDeps.forEach(dep=>{
-    const dr=f.filter(r=>r.dept===dep),bs=uniq(dr,'bp');
-    bs.forEach((bp,bi)=>{
-      const br=dr.filter(r=>r.bp===bp);
-      pvH+=`<tr><td>${bi===0?dep:''}</td><td style="font-size:13px;">${bp}</td><td class="num">${br.length}</td>
-        <td class="num">${br.filter(x=>x.o_letter).length||'—'}</td>
-        <td class="num">${br.filter(x=>x.p_extra).length||'—'}</td>
-        <td class="num">${br.filter(x=>x.q_appt).length||'—'}</td></tr>`;
-    });
-    pvH+=`<tr class="sub"><td colspan="2">รวม ${dep}</td><td class="num"><strong>${dr.length}</strong></td>
-      <td class="num">${dr.filter(x=>x.o_letter).length||'—'}</td>
-      <td class="num">${dr.filter(x=>x.p_extra).length||'—'}</td>
-      <td class="num">${dr.filter(x=>x.q_appt).length||'—'}</td></tr>`;
-  });
-  pvH+=`<tr class="grand"><td colspan="2">ผลรวมทั้งหมด</td><td class="num"><strong>${f.length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.o_letter).length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.p_extra).length}</strong></td>
-    <td class="num"><strong>${f.filter(x=>x.q_appt).length}</strong></td></tr></tbody></table>`;
-  document.getElementById('rjpWrap').innerHTML=pvH;
+  const RJ_GROUPS=[
+    {label:'ส่งจดหมาย',field:'o_letter',emptyLabel:'ยังไม่ดำเนินการ',color:{header:'#059669',sub:'#ECFDF5'}},
+    {label:'ใบตอบรับ',field:'p_extra',emptyLabel:'ยังไม่ดำเนินการ',color:{header:'#2563EB',sub:'#EFF6FF'}},
+    {label:'นัดรับมอบ',field:'q_appt',emptyLabel:'ยังไม่ดำเนินการ',color:{header:'#B45309',sub:'#FFFBEB'}},
+    {label:'สถานะส่งมอบ',field:'delivery_status',emptyLabel:'ไม่ระบุ',color:{header:'#0891B2',sub:'#ECFEFF'}},
+  ];
+  document.getElementById('rjpWrap').innerHTML=buildGroupedSummary('tRJP',f,RJ_GROUPS);
   document.getElementById('rjBody').innerHTML=f.map((x,i)=>`<tr>
     <td style="color:var(--t4);font-size:12px;">${i+1}</td>
     <td>${x.dept}</td><td style="font-size:13px;">${x.bp}</td>
