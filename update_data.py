@@ -305,7 +305,7 @@ def build_zm_rj_base(sheet, p_col, af_by_cust):
             'note': s(r.get('หมายเหตุ')),
             'sheet_custcare_status': s(r.get('CUSTCARE_STATUS_NAME')),  # ห้าม hardcode! อ่านค่าจริงเสมอ
             'contract_type': af_r.get('contract_type', '') if af_r else '',
-            'delivery_status': 'ยังไม่ส่งมอบ' if af_r else 'ส่งมอบแล้ว',
+            'delivery_status': 'พบใน CT_NotSend' if af_r else 'ไม่พบใน CT_NotSend',
         }
         recs.append((rec, af_r))
     return recs
@@ -354,8 +354,8 @@ def main():
     print(f'MN: {len(MN)} รายการ | พบใน AF: {mn_found} | ไม่พบ: {mn_not_found}')
 
     ZM = build_zm(af_by_cust)
-    zm_delivered = sum(1 for r in ZM if r['delivery_status'] == 'ส่งมอบแล้ว')
-    print(f'ZM: {len(ZM)} รายการ | ส่งมอบแล้ว(หลุดจาก AF): {zm_delivered}')
+    zm_delivered = sum(1 for r in ZM if r['delivery_status'] == 'ไม่พบใน CT_NotSend')
+    print(f'ZM: {len(ZM)} รายการ | ไม่พบใน CT_NotSend(หลุดจาก AF): {zm_delivered}')
 
     RJ = build_rj(af_by_cust)
     rj_changed = sum(1 for r in RJ if r['af_status'] and r['af_status'] != r['sheet_status'])
