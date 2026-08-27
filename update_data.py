@@ -281,7 +281,7 @@ def build_mn(af_by_cust):
 # ═══════════════════════════════════════════════════════════
 # 4) ZM (ดำเนินการเสร็จสิ้น) และ RJ (ประสงค์ขอส่วนลด)
 # ═══════════════════════════════════════════════════════════
-def build_zm_rj_base(sheet, p_col, af_by_cust):
+def build_zm_rj_base(sheet, p_col, af_by_cust, q_col='นัดรับมอบ'):
     df = pd.read_excel(EXCEL_FILE, sheet_name=sheet, header=3)
     recs = []
     for _, r in df.iterrows():
@@ -301,7 +301,7 @@ def build_zm_rj_base(sheet, p_col, af_by_cust):
             'change_status': safe_yyyymmdd_or_text(r.get('CHANGE_STATUS')),
             'agency': s(r.get('CONSTRUCTION_AGENCY')),
             'guarantee': s(r.get('ST_GUARANTEE')),   # ⚠️ ชื่อคอลัมน์เปลี่ยนจาก CONSTRUCTION_AGENCY.1 แล้ว
-            'o_letter': s(r.get('ส่งจดหมาย')), 'p_extra': s(r.get(p_col)), 'q_appt': s(r.get('นัดรับมอบ')),
+            'o_letter': s(r.get('ส่งจดหมาย')), 'p_extra': s(r.get(p_col)), 'q_appt': s(r.get(q_col)),
             'note': s(r.get('หมายเหตุ')),
             'sheet_custcare_status': s(r.get('CUSTCARE_STATUS_NAME')),  # ห้าม hardcode! อ่านค่าจริงเสมอ
             'contract_type': af_r.get('contract_type', '') if af_r else '',
@@ -321,7 +321,7 @@ def build_zm(af_by_cust):
     return ZM
 
 def build_rj(af_by_cust):
-    pairs = build_zm_rj_base(SHEET_RJ, 'ใบตอบรับ', af_by_cust)
+    pairs = build_zm_rj_base(SHEET_RJ, 'ใบตอบรับ', af_by_cust, q_col='ขอส่วนลด')
     RJ = []
     for rec, af_r in pairs:
         rec['sheet_status'] = rec.pop('sheet_custcare_status')  # ← อ่านจาก sheet จริง ไม่ hardcode
