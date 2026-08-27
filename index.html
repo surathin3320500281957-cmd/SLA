@@ -485,6 +485,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ส่งจดหมาย:</label><select id="rj-o" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ใบตอบรับ:</label><select id="rj-p" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ขอส่วนลด:</label><select id="rj-q" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
+    <label>สถานะเปลี่ยนจาก AF:</label><select id="rj-statuschg" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="เปลี่ยนสถานะ">เปลี่ยนสถานะ</option><option value="ไม่เปลี่ยนสถานะ">ไม่เปลี่ยนสถานะ</option></select>
     <button class="fbtn fbtn-clr" onclick="rjClear()">✕ ล้าง</button>
     <span class="fcnt" id="rj-cnt"></span>
   </div>
@@ -1403,8 +1404,8 @@ function renZM(){
 // ── RJ: ประสงค์ขอส่วนลด (ข้อมูลจาก sheet "รอจัดจ้าง") ──
 function rjFiltered(){
   const d=getV('rj-dept'),b=getV('rj-bp'),p=getV('rj-proj'),ct=getV('rj-ctype');
-  const dl=getV('rj-delivery'),o=getV('rj-o'),pp=getV('rj-p'),q=getV('rj-q'),cl=getV('rj-conlag');
-  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl));
+  const dl=getV('rj-delivery'),o=getV('rj-o'),pp=getV('rj-p'),q=getV('rj-q'),cl=getV('rj-conlag'),sc=getV('rj-statuschg');
+  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
 }
 function rjDeptChange(){
   const d=getV('rj-dept');
@@ -1420,7 +1421,7 @@ function rjBPChange(){
   renRJ();
 }
 function rjClear(){
-  ['rj-dept','rj-bp','rj-proj','rj-ctype','rj-delivery','rj-o','rj-p','rj-q','rj-conlag'].forEach(id=>setV(id,''));
+  ['rj-dept','rj-bp','rj-proj','rj-ctype','rj-delivery','rj-o','rj-p','rj-q','rj-conlag','rj-statuschg'].forEach(id=>setV(id,''));
   updSel('rj-bp',uniq(RJ,'bp'),'');updSel('rj-proj',uniq(RJ,'proj'),'');
   renRJ();
 }
@@ -1433,6 +1434,7 @@ const RJ_CHIP_CFG=[
   ['o','ส่งจดหมาย','orange','renRJ'],
   ['p','ใบตอบรับ','orange','renRJ'],
   ['q','ขอส่วนลด','orange','renRJ'],
+  ['statuschg','สถานะเปลี่ยนจาก AF','red','renRJ'],
   ['conlag','วันค้างทำสัญญา','orange','renRJ',v=>LAG_LABELS[v]||v],
 ];
 function renRJ(){
