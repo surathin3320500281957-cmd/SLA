@@ -146,10 +146,27 @@ KNOWN_HOUSE_FIXES = {
 # ═══════════════════════════════════════════════════════════
 # 1) AF
 # ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════
+# วันที่/เวลาอัปเดตที่แสดงผลบน Dashboard (ป้าย "อัปเดต: ...")
+# ⚠️ ห้ามพิมพ์วันที่เองแล้ว — ให้อ่านจากบรรทัดที่ 2 (แถวที่ 2, คอลัมน์ A) ของ sheet AF เสมอ
+#    ตัวอย่างข้อความจริง: "สัญญายังไม่บันทึกส่งมอบในระบบ F/E (CT_NOTSEND_CUSTCARE  ณ 18-8-69 11:00.45 น)"
+#    → ดึงวันที่/เวลาออกมาด้วย regex แล้ว format เป็น "DD-MM-YYYY(พ.ศ.) HH:MM น."
+# ═══════════════════════════════════════════════════════════
+def extract_update_banner():
+    df_raw = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_AF, header=None, nrows=2)
+    raw_text = s(df_raw.iloc[1, 0])
+    m = re.search(r'ณ\s*(\d{1,2})-(\d{1,2})-(\d{2})\s+(\d{1,2}):(\d{2})(?:[.:](\d{2}))?\s*น', raw_text)
+    if not m:
+        print(f'⚠️ ไม่พบรูปแบบวันที่ในบรรทัดที่ 2 ของ AF sheet: {raw_text!r} — ต้องใส่ป้าย "อัปเดต:" เองด้วยมือรอบนี้')
+        return {'raw': raw_text, 'date_display': '', 'time_display': ''}
+    d, mo, y2, hh, mi, _ = m.groups()
+    date_display = f'{int(d):02d}-{int(mo):02d}-25{y2}'   # ปีใน sheet เป็น พ.ศ. 2 หลักอยู่แล้ว (เช่น 69 → 2569)
+    time_display = f'{int(hh):02d}:{mi} น.'
+    return {'raw': raw_text, 'date_display': date_display, 'time_display': time_display}
+
 def build_af():
     df = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_AF, header=2)
     df_ck = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_CK, header=2)
-
     ck_lookup = {}       # cust -> ปรับสรุปการUPDATE (fallback สำหรับ update field)
     note_lookup = {}     # cust -> หมายเหตุ (join เข้า AF โดยตรง ให้ OVNA ได้ด้วยอัตโนมัติ)
     for _, r in df_ck.iterrows():
@@ -343,6 +360,10 @@ def main():
     print(f'=== อัปเดตข้อมูลจากไฟล์: {EXCEL_FILE} ===')
     print(f'=== วันที่อ้างอิง (REF_DATE): {REF_DATE_STR} — ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF ===\n')
 
+    update_banner = extract_update_banner()
+    print(f'=== ป้าย "อัปเดต:" ดึงจากบรรทัดที่ 2 ของ AF sheet: {update_banner["raw"]!r} ===')
+    print(f'    -> แสดงผลเป็น: อัปเดต: {update_banner["date_display"]}  {update_banner["time_display"]}\n')
+
     AF, af_fallback = build_af()
     af_by_cust = {r['cust']: r for r in AF}
     print(f'AF: {len(AF)} รายการ | update fallback (ไม่มีทั้ง CUSTCARE_STATUS_NAME และ ปรับสรุปการUPDATE): {af_fallback}')
@@ -395,7 +416,9 @@ def main():
     for name, data in [('AF', AF), ('NA', NA), ('MN', MN), ('ZM', ZM), ('RJ', RJ)]:
         with open(f'{name}_new.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
-    print('\n=== เขียนไฟล์ AF_new.json / NA_new.json / MN_new.json / ZM_new.json / RJ_new.json เรียบร้อย ===')
+    with open('UPDATE_BANNER.json', 'w', encoding='utf-8') as f:
+        json.dump(update_banner, f, ensure_ascii=False)
+    print('\n=== เขียนไฟล์ AF_new.json / NA_new.json / MN_new.json / ZM_new.json / RJ_new.json / UPDATE_BANNER.json เรียบร้อย ===')
     print('=== ตรวจสอบตัวเลขข้างบนให้ครบตามรายงานสรุปมาตรฐาน (README 9.1) ก่อน integrate เข้า index.html ===')
 
 
