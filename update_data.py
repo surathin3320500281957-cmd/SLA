@@ -212,9 +212,7 @@ def build_af():
             'change_status': s(r.get('CHANGE_STATUS')), 'status': s(r.get('NEXT_CUSTCARE')), 'update': upd,
             'guarantee': s(r.get('ST_GUARANTEE')), 'confirm_flag': s(r.get('CONFIRM_FLAG')),
             'next_custcare': s(r.get('NEXT_CUSTCARE')),
-            'start_con': dt_dmy_be(r.get('CONTRACT_DATE')), 'due_last': yyyymmdd_dmy_be(r.get('Dueล่าสุด')),
-            'due_amt': num_comma(r.get('เงินDue'), 2), 'overdue': num_int(r.get('งวดค้าง')),
-            'debt': num_comma(r.get('หนี้ค้าง'), 2), 'days_lag': days_lag,
+            'days_lag': days_lag,
             'ck_custcare_st': ck_raw, 'ck_custcare_st_grp': ck_grp,
             'd01': dt_dmy_be(r.get('DATE_01')), 'd02': dt_dmy_be(r.get('DATE_02')), 'd03': dt_dmy_be(r.get('DATE_03')),
             'd04': dt_dmy_be(r.get('DATE_04')), 'd05': dt_dmy_be(r.get('DATE_05')), 'd06': dt_dmy_be(r.get('DATE_06')),
@@ -265,8 +263,8 @@ def build_na(af_by_cust, na_fields):
 # ═══════════════════════════════════════════════════════════
 def build_mn(af_by_cust):
     df_mn = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_MN, header=60)  # ⚠️ header row เคยขยับ เช็คทุกรอบ
-    mn_fields = ['dept','bp','proj','house','cust','update','guarantee','start_con','due_last','due_amt',
-                 'overdue','debt','days_lag','ck_custcare_st','ck_custcare_st_grp','d01','d02','d03','d04',
+    mn_fields = ['dept','bp','proj','house','cust','update','guarantee','days_lag','ck_custcare_st',
+                 'ck_custcare_st_grp','d01','d02','d03','d04',
                  'd05','d06','d07','d08','d09','d10','d11','aging09','ck_aging09','contract_type']
     mn_new = []
     found_in_af = not_found = 0
@@ -285,8 +283,7 @@ def build_mn(af_by_cust):
             rec = {
                 'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
                 'house': house, 'cust': cust, 'update': s(r.get('ปรับสรุปการUPDATE')),
-                'guarantee': 'หลังค้ำประกัน', 'start_con': '', 'due_last': '', 'due_amt': '', 'overdue': '',
-                'debt': '', 'days_lag': '', 'ck_custcare_st': '', 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
+                'guarantee': 'หลังค้ำประกัน', 'days_lag': '', 'ck_custcare_st': '', 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
                 'd01': '', 'd02': '', 'd03': '', 'd04': '', 'd05': '', 'd06': '', 'd07': '', 'd08': '',
                 'd09': '', 'd10': '', 'd11': '', 'aging09': '', 'ck_aging09': '', 'contract_type': '',
             }
@@ -406,7 +403,7 @@ def main():
         common = [c for c in af_by_cust if c in old_by_cust]
         print(f'\n--- เทียบกับ AF เดิมในไฟล์ ---')
         print(f'ตรงกัน: {len(common)}/{len(AF)} (เดิมมี {len(old_af)})')
-        for f in ['dept', 'update', 'contract_type', 'd01', 'debt', 'guarantee']:
+        for f in ['dept', 'update', 'contract_type', 'd01', 'guarantee']:
             match = sum(1 for c in common if str(old_by_cust[c][f]) == str(af_by_cust[c][f]))
             print(f'  {f}: {match}/{len(common)} ({match/len(common)*100:.1f}%)')
     except Exception as e:
