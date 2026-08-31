@@ -453,8 +453,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
       <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ชื่อลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">วันที่ทำสัญญา</th><th class="ht" style="color:#B45309;">วันที่ค้างสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
+      <th class="ht">วันที่ทำสัญญา</th><th class="ht" style="color:#B45309;">วันที่ค้างสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
       <th class="hg">หน่วยงานก่อสร้าง</th><th class="hg">การค้ำประกัน</th>
       <th class="hg" style="color:#7B1111;">วันค้างสถานะเสร็จสิ้น</th>
       <th class="hi" style="background:#DCFCE7;">สถานะ CT_NotSend</th>
@@ -514,8 +513,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th style="width:36px;">#</th><th class="hw">กอง</th><th class="hw">สาขา</th>
       <th class="hw">โครงการ</th><th class="hw">บ้านเลขที่</th>
       <th class="ht">รหัสลูกค้า</th><th class="ht">ชื่อลูกค้า</th><th class="ht">ประเภทสัญญา</th>
-      <th class="ht">วันที่ทำสัญญา</th><th class="ht" style="color:#B45309;">วันที่ค้างสัญญา</th>
-      <th class="ht">เริ่มสัญญา</th><th class="ht" style="color:#B45309;">วันค้างทำสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
+      <th class="ht">วันที่ทำสัญญา</th><th class="ht" style="color:#B45309;">วันที่ค้างสัญญา</th><th class="ht">นัดส่งมอบครั้งแรก</th><th class="ht">นัดส่งมอบครั้งใหม่</th><th class="ht">CHANGE_STATUS</th>
       <th class="hg">หน่วยงานก่อสร้าง</th><th class="hg">การค้ำประกัน</th>
       <th class="hi" style="background:#F1F5F9;">CUSTCARE_STATUS_NAME<br>(sheet ขอลดค่าซ่อม)</th>
       <th class="hi" style="background:#E0EDFF;">CUSTCARE_STATUS_NAME<br>(update จาก AF)</th>
@@ -1377,8 +1375,6 @@ function renZM(){
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.contract_date||'—'}</td>
     ${conDateLagTd(x)}
-    <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
-    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_first||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.due_new||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.change_status||'—'}</td>
@@ -1469,8 +1465,6 @@ function renRJ(){
     <td style="font-size:12px;">${x.contract_type||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.contract_date||'—'}</td>
     ${conDateLagTd(x)}
-    <td style="font-size:12px;white-space:nowrap;">${x.start_con||'—'}</td>
-    ${conLagTd(x)}
     <td style="font-size:12px;white-space:nowrap;">${x.due_first||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.due_new||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.change_status||'—'}</td>
