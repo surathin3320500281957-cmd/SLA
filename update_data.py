@@ -35,7 +35,7 @@ import re
 # ตั้งค่าก่อนรันทุกครั้ง
 # ═══════════════════════════════════════════════════════════
 EXCEL_FILE = '/mnt/user-data/uploads/ส_ญญาย_งไม_ส_งมอบในระบบ-SLA.xlsx'  # ⚠️ แก้ path ให้ตรงกับไฟล์ที่อัปโหลดใหม่ทุกครั้ง
-REF_DATE_STR = '2026-08-27'   # ⚠️ ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF sheet (เช็คก่อนทุกครั้ง ไม่ใช่วันที่ upload ไฟล์) — sync กับ UPDATE_BANNER ทุกรอบ
+REF_DATE_STR = '2026-08-31'   # ⚠️ ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF sheet (เช็คก่อนทุกครั้ง ไม่ใช่วันที่ upload ไฟล์) — sync กับ UPDATE_BANNER ทุกรอบ
 OLD_INDEX_HTML = '/home/claude/index.html'  # ไฟล์ dashboard เดิม (เอาไว้เทียบผลลัพธ์)
 
 # ชื่อ sheet ปัจจุบัน — เคยเปลี่ยนมาแล้ว 1 ครั้ง (รอจัดจ้าง → ขอลดค่าซ่อม) เช็คชื่อ sheet จริงก่อนรันเสมอ
@@ -212,6 +212,7 @@ def build_af():
             'change_status': s(r.get('CHANGE_STATUS')), 'status': s(r.get('NEXT_CUSTCARE')), 'update': upd,
             'guarantee': s(r.get('ST_GUARANTEE')), 'confirm_flag': s(r.get('CONFIRM_FLAG')),
             'next_custcare': s(r.get('NEXT_CUSTCARE')),
+            'contract_date': yyyymmdd_dmy_be(r.get('CONTRACT_DATE')),
             'days_lag': days_lag,
             'ck_custcare_st': ck_raw, 'ck_custcare_st_grp': ck_grp,
             'd01': dt_dmy_be(r.get('DATE_01')), 'd02': dt_dmy_be(r.get('DATE_02')), 'd03': dt_dmy_be(r.get('DATE_03')),
@@ -263,7 +264,7 @@ def build_na(af_by_cust, na_fields):
 # ═══════════════════════════════════════════════════════════
 def build_mn(af_by_cust):
     df_mn = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_MN, header=60)  # ⚠️ header row เคยขยับ เช็คทุกรอบ
-    mn_fields = ['dept','bp','proj','house','cust','update','guarantee','days_lag','ck_custcare_st',
+    mn_fields = ['dept','bp','proj','house','cust','update','guarantee','contract_date','days_lag','ck_custcare_st',
                  'ck_custcare_st_grp','d01','d02','d03','d04',
                  'd05','d06','d07','d08','d09','d10','d11','aging09','ck_aging09','contract_type']
     mn_new = []
@@ -283,7 +284,7 @@ def build_mn(af_by_cust):
             rec = {
                 'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
                 'house': house, 'cust': cust, 'update': s(r.get('ปรับสรุปการUPDATE')),
-                'guarantee': 'หลังค้ำประกัน', 'days_lag': '', 'ck_custcare_st': '', 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
+                'guarantee': 'หลังค้ำประกัน', 'contract_date': '', 'days_lag': '', 'ck_custcare_st': '', 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
                 'd01': '', 'd02': '', 'd03': '', 'd04': '', 'd05': '', 'd06': '', 'd07': '', 'd08': '',
                 'd09': '', 'd10': '', 'd11': '', 'aging09': '', 'ck_aging09': '', 'contract_type': '',
             }
@@ -319,6 +320,7 @@ def build_zm_rj_base(sheet, p_col, af_by_cust, q_col='นัดรับมอ�
             'note': s(r.get('หมายเหตุ')),
             'sheet_custcare_status': s(r.get('CUSTCARE_STATUS_NAME')),  # ห้าม hardcode! อ่านค่าจริงเสมอ
             'contract_type': af_r.get('contract_type', '') if af_r else '',
+            'contract_date': af_r.get('contract_date', '') if af_r else '',
             'delivery_status': 'พบใน CT_NotSend' if af_r else 'ไม่พบใน CT_NotSend',
         }
         recs.append((rec, af_r))
