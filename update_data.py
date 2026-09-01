@@ -35,7 +35,7 @@ import re
 # ตั้งค่าก่อนรันทุกครั้ง
 # ═══════════════════════════════════════════════════════════
 EXCEL_FILE = '/mnt/user-data/uploads/ส_ญญาย_งไม_ส_งมอบในระบบ-SLA.xlsx'  # ⚠️ แก้ path ให้ตรงกับไฟล์ที่อัปโหลดใหม่ทุกครั้ง
-REF_DATE_STR = '2026-08-31'   # ⚠️ ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF sheet (เช็คก่อนทุกครั้ง ไม่ใช่วันที่ upload ไฟล์) — sync กับ UPDATE_BANNER ทุกรอบ
+REF_DATE_STR = '2026-09-01'   # ⚠️ ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF sheet (เช็คก่อนทุกครั้ง ไม่ใช่วันที่ upload ไฟล์) — sync กับ UPDATE_BANNER ทุกรอบ
 OLD_INDEX_HTML = '/home/claude/index.html'  # ไฟล์ dashboard เดิม (เอาไว้เทียบผลลัพธ์)
 
 # ชื่อ sheet ปัจจุบัน — เคยเปลี่ยนมาแล้ว 1 ครั้ง (รอจัดจ้าง → ขอลดค่าซ่อม) เช็คชื่อ sheet จริงก่อนรันเสมอ
