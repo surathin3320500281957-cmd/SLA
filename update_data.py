@@ -6,7 +6,7 @@ update_data.py — สคริปต์แปลงข้อมูล Excel →
     2. รัน: python3 update_data.py
     3. สคริปต์จะสร้างไฟล์ AF_new.json / NA_new.json / MN_new.json / ZM_new.json / RJ_new.json
        พร้อมพิมพ์รายงานสรุปมาตรฐาน (ตาม README หัวข้อ 9.1) ออกทางหน้าจอ
-    4. ตรวจสอบตัวเลขในรายงานให้ตรงกับที่คาดไว้ก่อน แล้วค่อยเขียนทับ AF/NA/MN/ZM/RJ ใน index.html
+    4. ตรวจสอบตัวเลขในรายงานให้ตรงกับที่คาดไว้ก่อน แล้วค่อยเขียนทับ AF/NA/ZM/RJ/MNA/MZM/MRJ ใน index.html
        (การ integrate เข้า index.html แนะนำให้ทำแยกเป็นอีกขั้นตอน ไม่ auto-write ในสคริปต์นี้
         เพื่อให้มีจังหวะตรวจสอบก่อนเขียนทับไฟล์จริงเสมอ ตาม README 9.1)
 
@@ -17,7 +17,7 @@ update_data.py — สคริปต์แปลงข้อมูล Excel →
 ประวัติ: สคริปต์นี้รวบรวม logic จากการอัปเดตข้อมูลหลายรอบ (18/21/25-08-69) รวมบั๊กที่เจอและแก้แล้ว:
   - ปี พ.ศ./ค.ศ. ปนกันในคอลัมน์ datetime เดียวกัน (CONTRACT_DATE vs DATE_01-11)
   - update field ต้อง coalesce 3 ชั้น
-  - NA/MN ต้องยึดฐานจาก sheet ต้นทาง ไม่ใช่ filter จาก AF
+  - NA ต้องยึดฐานจาก sheet ต้นทาง ไม่ใช่ filter จาก AF (MNA/MZM/MRJ ก็ยึดหลักเดียวกัน)
   - days_lag/ck_custcare_st ล้ำหน้า 1 สถานะ (แก้ฝั่ง JS ใน index.html ไม่ใช่ตรงนี้)
   - safe_start_con(): วันทำสัญญาของ ZM/RJ มีทั้ง serial number และ datetime แล้วแต่ sheet/รอบข้อมูล
   - safe_yyyymmdd_or_text(): due_first/change_status ของ ZM/RJ สลับบทบาทกันได้ระหว่างรอบข้อมูล
@@ -41,9 +41,14 @@ OLD_INDEX_HTML = '/home/claude/index.html'  # ไฟล์ dashboard เดิ�
 # ชื่อ sheet ปัจจุบัน — เคยเปลี่ยนมาแล้ว 1 ครั้ง (รอจัดจ้าง → ขอลดค่าซ่อม) เช็คชื่อ sheet จริงก่อนรันเสมอ
 SHEET_AF = 'AF'
 SHEET_CK = 'สำหรับกรอง-ตรวจสอบ'   # → NA, และ note ของ AF
-SHEET_MN = 'รายเดือน-ชน'          # → MN
 SHEET_ZM = 'ซ่อมเสร็จ'            # → ZM (ดำเนินการเสร็จสิ้น)
 SHEET_RJ = 'ขอลดค่าซ่อม'          # → RJ (ประสงค์ขอส่วนลด) — เดิมชื่อ "รอจัดจ้าง"
+
+# ── ข้อมูลหน่วยงานอื่น (main tab ใหม่ 25-08-69) — header row 4 (header=3) ทั้ง 3 sheet
+SHEET_MNA = 'หน่วยอื่นไม่ดำเนินงาน'   # → MNA (ไม่ดำเนินการ(หน่วยงานอื่น))
+SHEET_MZM = 'หน่วยอื่นซ่อมเสร็จ'      # → MZM (ดำเนินการเสร็จสิ้น(หน่วยงานอื่น))
+SHEET_MRJ = 'หน่วยอื่นขอลดค่าซ่อม'    # → MRJ (ประสงค์ขอส่วนลด(หน่วยงานอื่น))
+# ⚠️ guarantee ของ 3 sheet นี้อยู่ในคอลัมน์ 'CONSTRUCTION_AGENCY.1' (ไม่ใช่ 'ST_GUARANTEE' แบบ ZM/RJ เดิม) — เช็คทุกรอบ
 
 REF = datetime.date.fromisoformat(REF_DATE_STR)
 
@@ -260,40 +265,6 @@ def build_na(af_by_cust, na_fields):
 
 
 # ═══════════════════════════════════════════════════════════
-# 3) MN (ข้อมูลหน่วยงานอื่น) — ยึดฐานจาก sheet รายเดือน-ชน
-# ═══════════════════════════════════════════════════════════
-def build_mn(af_by_cust):
-    df_mn = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_MN, header=60)  # ⚠️ header row เคยขยับ เช็คทุกรอบ
-    mn_fields = ['dept','bp','proj','house','cust','update','guarantee','contract_date','days_lag','ck_custcare_st',
-                 'ck_custcare_st_grp','d01','d02','d03','d04',
-                 'd05','d06','d07','d08','d09','d10','d11','aging09','ck_aging09','contract_type']
-    mn_new = []
-    found_in_af = not_found = 0
-    for _, r in df_mn.iterrows():
-        cust = num_int(r['รหัสลูกค้า'])
-        if not cust:
-            continue
-        if cust in af_by_cust:
-            af_r = af_by_cust[cust]
-            rec = {k: af_r[k] for k in mn_fields}
-            found_in_af += 1
-        else:
-            house = s(r.get('บ้านเลขที่'))
-            if cust in KNOWN_HOUSE_FIXES and house_corrupted(house):
-                house = KNOWN_HOUSE_FIXES[cust]
-            rec = {
-                'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
-                'house': house, 'cust': cust, 'update': s(r.get('ปรับสรุปการUPDATE')),
-                'guarantee': 'หลังค้ำประกัน', 'contract_date': '', 'days_lag': '', 'ck_custcare_st': '', 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
-                'd01': '', 'd02': '', 'd03': '', 'd04': '', 'd05': '', 'd06': '', 'd07': '', 'd08': '',
-                'd09': '', 'd10': '', 'd11': '', 'aging09': '', 'ck_aging09': '', 'contract_type': '',
-            }
-            not_found += 1
-        mn_new.append(rec)
-    return mn_new, found_in_af, not_found
-
-
-# ═══════════════════════════════════════════════════════════
 # 4) ZM (ดำเนินการเสร็จสิ้น) และ RJ (ประสงค์ขอส่วนลด)
 # ═══════════════════════════════════════════════════════════
 def build_zm_rj_base(sheet, p_col, af_by_cust, q_col='นัดรับมอบ'):
@@ -325,6 +296,95 @@ def build_zm_rj_base(sheet, p_col, af_by_cust, q_col='นัดรับมอ�
         }
         recs.append((rec, af_r))
     return recs
+
+def build_zm_rj_base_v2(sheet, p_col, af_by_cust, q_col, guarantee_col='ST_GUARANTEE'):
+    """เหมือน build_zm_rj_base ทุกประการ แต่รองรับชื่อคอลัมน์ guarantee ที่ต่างกันได้
+    (sheet 'หน่วยอื่น...' ใช้ 'CONSTRUCTION_AGENCY.1' แทน 'ST_GUARANTEE')"""
+    df = pd.read_excel(EXCEL_FILE, sheet_name=sheet, header=3)
+    recs = []
+    for _, r in df.iterrows():
+        cust = s(int(r['รหัสลูกค้า'])) if pd.notna(r['รหัสลูกค้า']) else ''
+        if not cust:
+            continue
+        af_r = af_by_cust.get(cust)
+        house = s(r.get('บ้านเลขที่'))
+        if cust in KNOWN_HOUSE_FIXES and house_corrupted(house):
+            house = KNOWN_HOUSE_FIXES[cust]
+        rec = {
+            'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
+            'house': house, 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
+            'start_con': safe_start_con(r.get('วันที่ทำสัญญา')),
+            'due_first': safe_yyyymmdd_or_text(r.get('วันที่นัด\nส่งมอบครั้งแรก')),
+            'due_new': yyyymmdd_dmy_be(r.get('วันที่นัด\nส่งมอบครั้งใหม่')),
+            'change_status': safe_yyyymmdd_or_text(r.get('CHANGE_STATUS')),
+            'agency': s(r.get('CONSTRUCTION_AGENCY')),
+            'guarantee': s(r.get(guarantee_col)),
+            'o_letter': s(r.get('ส่งจดหมาย')), 'p_extra': s(r.get(p_col)), 'q_appt': s(r.get(q_col)),
+            'note': s(r.get('หมายเหตุ')),
+            'sheet_custcare_status': s(r.get('CUSTCARE_STATUS_NAME')),
+            'contract_type': af_r.get('contract_type', '') if af_r else '',
+            'contract_date': af_r.get('contract_date', '') if af_r else '',
+            'delivery_status': 'พบใน CT_NotSend' if af_r else 'ไม่พบใน CT_NotSend',
+        }
+        recs.append((rec, af_r))
+    return recs
+
+
+# ═══════════════════════════════════════════════════════════
+# 5) ข้อมูลหน่วยงานอื่น — MNA / MZM / MRJ (main tab ใหม่, โครงสร้างเดียวกับ NA/ZM/RJ)
+# ═══════════════════════════════════════════════════════════
+def build_mna(af_by_cust, na_fields):
+    df_ck = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_MNA, header=3)
+    mna_new = []
+    found_cnt = not_found_cnt = 0
+    for _, r in df_ck.iterrows():
+        cust = num_int(r['รหัสลูกค้า'])
+        if not cust:
+            continue
+        note = s(r.get('หมายเหตุ'))
+        if cust in af_by_cust:
+            rec = dict(af_by_cust[cust])
+            found_cnt += 1
+        else:
+            upd = s(r.get('ปรับสรุปการUPDATE'))
+            rec = {k: '' for k in na_fields}
+            rec.update({
+                'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
+                'house': s(r.get('บ้านเลขที่')), 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
+                'change_status': s(r.get('CHANGE_STATUS')), 'status': upd, 'update': upd,
+                'confirm_flag': s(r.get('CONFIRM_FLAG')), 'next_custcare': upd,
+                'ck_custcare_st_grp': 'ไม่เคยซ่อม',
+            })
+            not_found_cnt += 1
+        rec['note'] = note
+        mna_new.append(rec)
+    return mna_new, found_cnt, not_found_cnt
+
+def build_mzm(af_by_cust):
+    pairs = build_zm_rj_base_v2(SHEET_MZM, 'แจ้งซ่อมเพิ่มเติม', af_by_cust, q_col='นัดรับมอบ', guarantee_col='CONSTRUCTION_AGENCY.1')
+    MZM = []
+    for rec, af_r in pairs:
+        sl = status_lag(af_r)
+        rec['status_lag'] = str(sl) if sl is not None else ''
+        del rec['sheet_custcare_status']
+        MZM.append(rec)
+    return MZM
+
+def build_mrj(af_by_cust):
+    pairs = build_zm_rj_base_v2(SHEET_MRJ, 'ใบตอบรับ', af_by_cust, q_col='ขอส่วนลด', guarantee_col='CONSTRUCTION_AGENCY.1')
+    MRJ = []
+    for rec, af_r in pairs:
+        rec['sheet_status'] = rec.pop('sheet_custcare_status')
+        if af_r:
+            rec['af_status'] = af_r.get('update', '')
+            sl = status_lag(af_r)
+            rec['af_status_lag'] = str(sl) if sl is not None else ''
+        else:
+            rec['af_status'] = ''
+            rec['af_status_lag'] = ''
+        MRJ.append(rec)
+    return MRJ
+
 
 def build_zm(af_by_cust):
     pairs = build_zm_rj_base(SHEET_ZM, 'แจ้งซ่อมเพิ่มเติม', af_by_cust)
@@ -370,9 +430,6 @@ def main():
     NA, na_found, na_not_found = build_na(af_by_cust, list(AF[0].keys()))
     print(f'NA: {len(NA)} รายการ | พบใน AF: {na_found} | ไม่พบ: {na_not_found}')
 
-    MN, mn_found, mn_not_found = build_mn(af_by_cust)
-    print(f'MN: {len(MN)} รายการ | พบใน AF: {mn_found} | ไม่พบ: {mn_not_found}')
-
     ZM = build_zm(af_by_cust)
     zm_delivered = sum(1 for r in ZM if r['delivery_status'] == 'ไม่พบใน CT_NotSend')
     print(f'ZM: {len(ZM)} รายการ | ไม่พบใน CT_NotSend(หลุดจาก AF): {zm_delivered}')
@@ -381,9 +438,18 @@ def main():
     rj_changed = sum(1 for r in RJ if r['af_status'] and r['af_status'] != r['sheet_status'])
     print(f'RJ: {len(RJ)} รายการ | สถานะเปลี่ยนจาก sheet_status แล้ว: {rj_changed}')
 
+    MNA, mna_found, mna_not_found = build_mna(af_by_cust, list(AF[0].keys()))
+    print(f'MNA (ไม่ดำเนินการ หน่วยงานอื่น): {len(MNA)} รายการ | พบใน AF: {mna_found} | ไม่พบ: {mna_not_found}')
+
+    MZM = build_mzm(af_by_cust)
+    print(f'MZM (ดำเนินการเสร็จสิ้น หน่วยงานอื่น): {len(MZM)} รายการ')
+
+    MRJ = build_mrj(af_by_cust)
+    print(f'MRJ (ประสงค์ขอส่วนลด หน่วยงานอื่น): {len(MRJ)} รายการ')
+
     # เช็คบ้านเลขที่เพี้ยน
     print('\n--- เช็คบ้านเลขที่เพี้ยนเป็นวันที่ ---')
-    for name, arr in [('AF', AF), ('NA', NA), ('MN', MN), ('ZM', ZM), ('RJ', RJ)]:
+    for name, arr in [('AF', AF), ('NA', NA), ('ZM', ZM), ('RJ', RJ), ('MNA', MNA), ('MZM', MZM), ('MRJ', MRJ)]:
         bad = [(r['cust'], r['house']) for r in arr if house_corrupted(r.get('house', ''))]
         print(f'{name}: {len(bad)} จุด' + (f' -> {bad}' if bad else ''))
         if bad:
@@ -394,7 +460,6 @@ def main():
     ovna = [r for r in AF if r['status'] == 'ไม่ดำเนินการ']
     print(f'OVNA (derive จาก AF.filter): {len(ovna)} | ในสถานะจริง (ต้องเป็น 0 เสมอ): {sum(1 for r in ovna if r["update"] in STAGES11)}')
     print(f'NA: {len(NA)} | ในสถานะจริงปนอยู่: {sum(1 for r in NA if r["update"] in STAGES11)}')
-    print(f'MN: {len(MN)} | ในสถานะจริงปนอยู่: {sum(1 for r in MN if r["update"] in STAGES11)}')
 
     # เทียบกับข้อมูลเดิมในไฟล์ (ถ้ามี)
     try:
@@ -412,7 +477,8 @@ def main():
         print(f'\n(ข้ามการเทียบกับไฟล์เดิม: {e})')
 
     # เขียนไฟล์ผลลัพธ์
-    for name, data in [('AF', AF), ('NA', NA), ('MN', MN), ('ZM', ZM), ('RJ', RJ)]:
+    for name, data in [('AF', AF), ('NA', NA), ('ZM', ZM), ('RJ', RJ),
+                        ('MNA', MNA), ('MZM', MZM), ('MRJ', MRJ)]:
         with open(f'{name}_new.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
     with open('UPDATE_BANNER.json', 'w', encoding='utf-8') as f:
