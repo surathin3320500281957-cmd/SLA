@@ -35,7 +35,7 @@ import re
 # ตั้งค่าก่อนรันทุกครั้ง
 # ═══════════════════════════════════════════════════════════
 EXCEL_FILE = '/mnt/user-data/uploads/ส_ญญาย_งไม_ส_งมอบในระบบ-SLA.xlsx'  # ⚠️ แก้ path ให้ตรงกับไฟล์ที่อัปโหลดใหม่ทุกครั้ง
-REF_DATE_STR = '2026-09-03'   # ⚠️ ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF sheet (เช็คก่อนทุกครั้ง ไม่ใช่วันที่ upload ไฟล์) — sync กับ UPDATE_BANNER ทุกรอบ
+REF_DATE_STR = '2026-09-07'
 OLD_INDEX_HTML = '/home/claude/index.html'  # ไฟล์ dashboard เดิม (เอาไว้เทียบผลลัพธ์)
 
 # ชื่อ sheet ปัจจุบัน — เคยเปลี่ยนมาแล้ว 1 ครั้ง (รอจัดจ้าง → ขอลดค่าซ่อม) เช็คชื่อ sheet จริงก่อนรันเสมอ
@@ -171,6 +171,11 @@ def extract_update_banner():
 
 def build_af():
     df = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_AF, header=2)
+    # ⚠️ กันแถวขยะ: บางรอบไฟล์ต้นทางมีแถว header ซ้ำปนมาใน data (CUST_CODE เป็นข้อความ 'CUST_CODE' แทนตัวเลข) — ตัดทิ้งก่อนประมวลผลเสมอ
+    junk_mask = pd.to_numeric(df['CUST_CODE'], errors='coerce').isna() & df['CUST_CODE'].notna()
+    if junk_mask.any():
+        print(f'⚠️ พบแถวขยะใน AF sheet (CUST_CODE ไม่ใช่ตัวเลข) {junk_mask.sum()} แถว — ตัดทิ้งก่อนประมวลผล')
+        df = df[~junk_mask].reset_index(drop=True)
     df_ck = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_CK, header=2)
     ck_lookup = {}       # cust -> ปรับสรุปการUPDATE (fallback สำหรับ update field)
     note_lookup = {}     # cust -> หมายเหตุ (join เข้า AF โดยตรง ให้ OVNA ได้ด้วยอัตโนมัติ)
