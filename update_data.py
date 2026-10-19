@@ -35,7 +35,7 @@ import re
 # ตั้งค่าก่อนรันทุกครั้ง
 # ═══════════════════════════════════════════════════════════
 EXCEL_FILE = '/mnt/user-data/uploads/ส_ญญาย_งไม_ส_งมอบในระบบ-SLA.xlsx'  # ⚠️ แก้ path ให้ตรงกับไฟล์ที่อัปโหลดใหม่ทุกครั้ง
-REF_DATE_STR = '2026-09-21'
+REF_DATE_STR = '2026-10-19'
 OLD_INDEX_HTML = '/home/claude/index.html'  # ไฟล์ dashboard เดิม (เอาไว้เทียบผลลัพธ์)
 
 # ชื่อ sheet ปัจจุบัน — เคยเปลี่ยนมาแล้ว 1 ครั้ง (รอจัดจ้าง → ขอลดค่าซ่อม) เช็คชื่อ sheet จริงก่อนรันเสมอ
@@ -451,6 +451,14 @@ def main():
 
     MRJ = build_mrj(af_by_cust)
     print(f'MRJ (ประสงค์ขอส่วนลด หน่วยงานอื่น): {len(MRJ)} รายการ')
+
+    # ⚠️ เช็ครหัสลูกค้า (join key) ไม่ซ้ำ + join AF — กันเคสรหัสถูกปัดเป็น 200000000 ในไฟล์ต้นทาง (เจอ 21-9-69: ผ่าน "เป็นตัวเลข" แต่เหลือ 2 ค่า)
+    print('\n--- เช็ครหัสลูกค้าไม่ซ้ำ (distinct = จำนวนแถว ถ้าปกติ) + join AF ---')
+    for name, arr in [('NA', NA), ('ZM', ZM), ('RJ', RJ), ('MNA', MNA), ('MZM', MZM), ('MRJ', MRJ)]:
+        distinct = len({r['cust'] for r in arr})
+        in_af = sum(1 for r in arr if r['cust'] in af_by_cust)
+        flag = '' if distinct == len(arr) else '  ❌ รหัสซ้ำ/เพี้ยน — หยุด ตรวจไฟล์ต้นทางก่อน integrate'
+        print(f'{name}: {len(arr)} แถว | รหัสไม่ซ้ำ {distinct} | พบใน AF {in_af}{flag}')
 
     # เช็คบ้านเลขที่เพี้ยน
     print('\n--- เช็คบ้านเลขที่เพี้ยนเป็นวันที่ ---')
