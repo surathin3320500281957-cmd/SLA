@@ -37,6 +37,23 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t1);font-
   display:flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0;}
 .tbtn:hover{color:var(--blu);background:#EEF4FF;}
 .tbtn.on{color:#fff;background:var(--pur);border-bottom-color:var(--pur);border-radius:10px 10px 0 0;font-weight:700;}
+/* ── หัวคอลัมน์วันค้างที่คลิกกำหนดช่วงได้ ── */
+th.lagth{cursor:pointer;user-select:none;position:relative;}
+th.lagth:hover{filter:brightness(.93);}
+th.lagth .lagi{display:inline-block;margin-left:4px;font-size:10px;opacity:.65;}
+th.lagth.lag-on{outline:2px solid var(--pur);outline-offset:-2px;}
+th.lagth .lagbadge{display:block;margin-top:3px;background:var(--pur);color:#fff;border-radius:10px;padding:1px 7px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+#lagPop{position:absolute;z-index:9999;width:300px;background:#fff;border:2px solid var(--pur);border-radius:12px;box-shadow:var(--shm);padding:12px 14px;font-size:13px;color:var(--t1);}
+#lagPop .lp-t{font-weight:800;color:var(--pur);font-size:14px;margin-bottom:2px;}
+#lagPop .lp-s{font-size:11.5px;color:var(--t3);margin-bottom:8px;}
+#lagPop .lp-r{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+#lagPop input{width:96px;padding:6px 8px;border:1px solid var(--bdr);border-radius:8px;font-size:14px;}
+#lagPop .lp-e{color:var(--red);font-size:12px;min-height:16px;}
+#lagPop .lp-b{display:flex;gap:6px;justify-content:flex-end;margin-top:4px;}
+#lagPop button{border:0;border-radius:16px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:13px;}
+#lagPop .lp-ok{background:var(--pur);color:#fff;}
+#lagPop .lp-clr{background:var(--redL);color:var(--red);}
+#lagPop .lp-x{background:#eee;color:var(--t2);}
 .tbtn.on .tpill{background:rgba(255,255,255,.28);color:#fff;}
 .tpill{font-size:12px;font-weight:700;padding:3px 9px;border-radius:12px;}
 .tp-b{background:var(--bluL);color:var(--blu);}
@@ -418,7 +435,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <span class="sep">›</span>
     <label>โครงการ:</label><select id="zm-proj" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="zm-ctype" onchange="renZM()"><option value="">ทั้งหมด</option></select>
-    <label>วันค้างทำสัญญา:</label><select id="zm-conlag" onchange="renZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="zm-conlag" onchange="renZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="zm-delivery" onchange="renZM()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="zm-o" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>แจ้งซ่อมเพิ่มเติม:</label><select id="zm-p" onchange="renZM()"><option value="">ทั้งหมด</option></select>
@@ -477,7 +494,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <span class="sep">›</span>
     <label>โครงการ:</label><select id="rj-proj" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="rj-ctype" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
-    <label>วันค้างทำสัญญา:</label><select id="rj-conlag" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="rj-conlag" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="rj-delivery" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="rj-o" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ใบตอบรับ:</label><select id="rj-p" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
@@ -605,7 +622,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <span class="sep">›</span>
     <label>โครงการ:</label><select id="mzm-proj" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="mzm-ctype" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
-    <label>วันค้างทำสัญญา:</label><select id="mzm-conlag" onchange="renMZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="mzm-conlag" onchange="renMZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="mzm-delivery" onchange="renMZM()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="mzm-o" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
     <label>แจ้งซ่อมเพิ่มเติม:</label><select id="mzm-p" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
@@ -664,7 +681,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <span class="sep">›</span>
     <label>โครงการ:</label><select id="mrj-proj" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="mrj-ctype" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
-    <label>วันค้างทำสัญญา:</label><select id="mrj-conlag" onchange="renMRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="mrj-conlag" onchange="renMRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="mrj-delivery" onchange="renMRJ()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="mrj-o" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
     <label>ใบตอบรับ:</label><select id="mrj-p" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
@@ -781,6 +798,20 @@ const updSummary=x=>STAGES11.includes(x.update)?'':x.update;
 
 // ── Filter chips (แสดง filter ที่เลือกอยู่เป็น chip สีตามหมวดหมู่ ลบได้ทีละตัว) ──
 const LAG_LABELS={'1-30':'0-30 วัน','31-60':'31-60 วัน','61-90':'61-90 วัน','90+':'เกิน 90 วัน'};
+// ═══ ช่วงวันค้างกำหนดเอง: เก็บเป็นค่า select 'c:min-max' (max ว่าง = ไม่จำกัดบน) ═══
+function lagCustomText(v){
+  const m=/^c:(\d*)-(\d*)$/.exec(v||'');if(!m)return null;
+  const lo=m[1],hi=m[2];
+  if(lo!==''&&hi!=='')return `${lo}–${hi} วัน`;
+  if(lo!=='')return `ตั้งแต่ ${lo} วันขึ้นไป`;
+  if(hi!=='')return `ไม่เกิน ${hi} วัน`;
+  return 'ทุกช่วง';
+}
+function lagLabel(v){const c=lagCustomText(v);return c?`${c} (กำหนดเอง)`:(LAG_LABELS[v]||v);}
+function lagPruneCustom(sel){
+  if(!sel||sel.tagName!=='SELECT')return;
+  [...sel.options].forEach(o=>{if(o.value.startsWith('c:')&&o.value!==sel.value)o.remove();});
+}
 // วันค้างทำสัญญา: จำนวนวันจากวันทำสัญญา (start_con, รูปแบบ DD/MM/YY พ.ศ.) ถึง UPD_REF_DATE
 function parseDMY(str){
   if(!str)return null;
@@ -822,6 +853,7 @@ function inLagRangeStrict(v,range){
   return inLagRange(v,range);
 }
 const CKLAG_LABELS={...LAG_LABELS,'never':'ไม่เคยซ่อม'};
+function cklagLabel(v){return v==='never'?'ไม่เคยซ่อม':lagLabel(v);}
 // cfg: [id-suffix, label, สี, ฟังก์ชันที่เรียกตอนลบ chip นี้ (ชื่อฟังก์ชัน, ไม่ใส่วงเล็บ), ตัวแปลงค่าดิบเป็นข้อความแสดงผล (optional)]
 const OV_CHIP_CFG=[
   ['dept','กอง','purple','ovDeptChange'],
@@ -834,8 +866,8 @@ const OV_CHIP_CFG=[
   ['upd','ปรับสรุปการ UPDATE','green','renOv'],
   ['ck','เช็คสถานะซ่อมหลังสุด','green','renOv'],
   ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green','renOv'],
-  ['lag','วันค้างสถานะ','orange','renOv',v=>LAG_LABELS[v]||v],
-  ['cklag','วันค้างสถานะซ่อมหลังสุด','orange','renOv',v=>CKLAG_LABELS[v]||v],
+  ['lag','วันค้างสถานะ','orange','renOv',v=>lagLabel(v)],
+  ['cklag','วันค้างสถานะซ่อมหลังสุด','orange','renOv',v=>cklagLabel(v)],
   ['note','หมายเหตุ','blue','renOv'],
 ];
 function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
@@ -846,8 +878,8 @@ function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
   ['upd','ปรับสรุปการ UPDATE','green',RenFn],
   ['ck','เช็คสถานะซ่อมหลังสุด','green',RenFn],
   ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green',RenFn],
-  ['lag','วันค้างสถานะ','orange',RenFn,v=>LAG_LABELS[v]||v],
-  ['cklag','วันค้างสถานะซ่อมหลังสุด','orange',RenFn,v=>CKLAG_LABELS[v]||v],
+  ['lag','วันค้างสถานะ','orange',RenFn,v=>lagLabel(v)],
+  ['cklag','วันค้างสถานะซ่อมหลังสุด','orange',RenFn,v=>cklagLabel(v)],
 ];}
 const OVNA_CHIP_CFG=[...otherChipCfg('ovna','ovnaDeptChange','ovnaBPChange','renOvNA'),['note','หมายเหตุ','blue','renOvNA']];
 const NA_CHIP_CFG=[...otherChipCfg('na','naDeptChange','naBPChange','renNA'),['note','หมายเหตุ','blue','renNA',v=>v==='has'?'มีหมายเหตุ':'ไม่มีหมายเหตุ']];
@@ -864,6 +896,7 @@ function renderChips(pfx,cfg,containerId,extra){
   if(extra)parts.push(extra);
   const el=document.getElementById(containerId);
   if(el)el.innerHTML=parts.join('');
+  if(typeof lagRefreshHeads==='function')lagRefreshHeads();
 }
 // donut อย่างง่าย สำหรับ "มีข้อมูล / ยังไม่มี" ในคอลัมน์ติดตามงาน (ส่งจดหมาย/แจ้งซ่อมเพิ่มเติม/ใบตอบรับ/นัดรับมอบ)
 function statusDonut(key,canvasId,legId,done,total,doneColor,doneLabel){
@@ -939,7 +972,8 @@ function updSel(id,opts,cur){
 function getV(id){return document.getElementById(id)?.value||'';}
 
 // วันที่อ้างอิงสำหรับคำนวณ "วันค้างสถานะซ่อมหลังสุด" — ตรงกับวันที่ update ข้อมูล (ค.ศ.)
-const UPD_REF_DATE=new Date(2026,7,31); // เดือนใน JS Date เริ่มที่ 0 → 7=สิงหาคม — ต้อง sync กับ REF_DATE_STR ใน update_data.py / UPDATE_BANNER ทุกรอบ
+// วันที่อ้างอิงคำนวณวันค้าง = วันที่ข้อมูลจาก UPDATE_BANNER.date (DD-MM-พ.ศ.) อัตโนมัติ — ไม่ต้อง sync มือทุกรอบแล้ว
+const UPD_REF_DATE=(()=>{const m=/^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec((typeof UPDATE_BANNER!=='undefined'&&UPDATE_BANNER&&UPDATE_BANNER.date)||'');return m?new Date(+m[3]-543,+m[2]-1,+m[1]):new Date();})();
 function ckLagValue(x){
   const raw=(x.ck_custcare_st||'').trim();
   if(!raw)return'ไม่เคยซ่อม';
@@ -972,12 +1006,14 @@ function ckLagTd(x){
 function inLagRange(days_lag,range){
   if(!range)return true;
   const lg=Number(days_lag||0);
+  const cm=/^c:(\d*)-(\d*)$/.exec(range);
+  if(cm){const lo=cm[1]===''?0:+cm[1],hi=cm[2]===''?Infinity:+cm[2];return lg>=lo&&lg<=hi;}
   if(range==='1-30')return lg>=0&&lg<=30;
   if(range==='31-60')return lg>=31&&lg<=60;
   if(range==='61-90')return lg>=61&&lg<=90;
   if(range==='90+')return lg>90;
   return true;
-}function setV(id,v){const el=document.getElementById(id);if(el)el.value=v;}
+}function setV(id,v){const el=document.getElementById(id);if(el){el.value=v;lagPruneCustom(el);}}
 
 // ════════════════════════════════
 // OVERVIEW
@@ -1422,7 +1458,7 @@ function naSubCounts(){
 function zmFiltered(){
   const d=getV('zm-dept'),b=getV('zm-bp'),p=getV('zm-proj'),ct=getV('zm-ctype');
   const dl=getV('zm-delivery'),o=getV('zm-o'),pp=getV('zm-p'),q=getV('zm-q'),cl=getV('zm-conlag');
-  return ZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl));
+  return ZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl));
 }
 function zmDeptChange(){
   const d=getV('zm-dept');
@@ -1451,7 +1487,7 @@ const ZM_CHIP_CFG=[
   ['o','ส่งจดหมาย','orange','renZM'],
   ['p','แจ้งซ่อมเพิ่มเติม','orange','renZM'],
   ['q','นัดรับมอบ','orange','renZM'],
-  ['conlag','วันค้างทำสัญญา','orange','renZM',v=>LAG_LABELS[v]||v],
+  ['conlag','วันที่ค้างสัญญา','orange','renZM',v=>lagLabel(v)],
 ];
 function renZM(){
   const f=zmFiltered();
@@ -1511,7 +1547,7 @@ function renZM(){
 function rjFiltered(){
   const d=getV('rj-dept'),b=getV('rj-bp'),p=getV('rj-proj'),ct=getV('rj-ctype');
   const dl=getV('rj-delivery'),o=getV('rj-o'),pp=getV('rj-p'),q=getV('rj-q'),cl=getV('rj-conlag'),sc=getV('rj-statuschg');
-  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
+  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
 }
 function rjDeptChange(){
   const d=getV('rj-dept');
@@ -1541,7 +1577,7 @@ const RJ_CHIP_CFG=[
   ['p','ใบตอบรับ','orange','renRJ'],
   ['q','ขอส่วนลด','orange','renRJ'],
   ['statuschg','สถานะเปลี่ยนจาก AF','red','renRJ'],
-  ['conlag','วันค้างทำสัญญา','orange','renRJ',v=>LAG_LABELS[v]||v],
+  ['conlag','วันที่ค้างสัญญา','orange','renRJ',v=>lagLabel(v)],
 ];
 function renRJ(){
   const f=rjFiltered();
@@ -1730,7 +1766,7 @@ function mnaSubCounts(){
 function mzmFiltered(){
   const d=getV('mzm-dept'),b=getV('mzm-bp'),p=getV('mzm-proj'),ct=getV('mzm-ctype');
   const dl=getV('mzm-delivery'),o=getV('mzm-o'),pp=getV('mzm-p'),q=getV('mzm-q'),cl=getV('mzm-conlag');
-  return MZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl));
+  return MZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl));
 }
 function mzmDeptChange(){
   const d=getV('mzm-dept');
@@ -1759,7 +1795,7 @@ const MZM_CHIP_CFG=[
   ['o','ส่งจดหมาย','orange','renMZM'],
   ['p','แจ้งซ่อมเพิ่มเติม','orange','renMZM'],
   ['q','นัดรับมอบ','orange','renMZM'],
-  ['conlag','วันค้างทำสัญญา','orange','renMZM',v=>LAG_LABELS[v]||v],
+  ['conlag','วันที่ค้างสัญญา','orange','renMZM',v=>lagLabel(v)],
 ];
 function renMZM(){
   const f=mzmFiltered();
@@ -1819,7 +1855,7 @@ function renMZM(){
 function mrjFiltered(){
   const d=getV('mrj-dept'),b=getV('mrj-bp'),p=getV('mrj-proj'),ct=getV('mrj-ctype');
   const dl=getV('mrj-delivery'),o=getV('mrj-o'),pp=getV('mrj-p'),q=getV('mrj-q'),cl=getV('mrj-conlag'),sc=getV('mrj-statuschg');
-  return MRJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
+  return MRJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
 }
 function mrjDeptChange(){
   const d=getV('mrj-dept');
@@ -1849,7 +1885,7 @@ const MRJ_CHIP_CFG=[
   ['p','ใบตอบรับ','orange','renMRJ'],
   ['q','ขอส่วนลด','orange','renMRJ'],
   ['statuschg','สถานะเปลี่ยนจาก AF','red','renMRJ'],
-  ['conlag','วันค้างทำสัญญา','orange','renMRJ',v=>LAG_LABELS[v]||v],
+  ['conlag','วันที่ค้างสัญญา','orange','renMRJ',v=>lagLabel(v)],
 ];
 function renMRJ(){
   const f=mrjFiltered();
@@ -2142,6 +2178,83 @@ function ds(){const n=new Date();return `${n.getDate()}-${n.getMonth()+1}-${n.ge
 
 // Boot
 initCharts();initDDs();renRefTable();renOv();renOvNA();renNA();renZM();renRJ();renMNA();renMZM();renMRJ();
+
+// ═══════════════════════════════════════════════
+// ช่วงวันค้างกำหนดเอง — คลิกหัวคอลัมน์ → ใส่ จาก/ถึง กี่วัน (ทุก tab ที่มี filter วันค้าง)
+// หัวคอลัมน์ ↔ select (ชื่อหัวต้องตรงเป๊ะ)
+// ═══════════════════════════════════════════════
+const LAG_HEADS=[
+  ['tOv','วันค้างสถานะ','ov-lag'],['tOv','วันค้างสถานะซ่อมหลังสุด','ov-cklag'],
+  ['tOvNA','วันค้างสถานะ','ovna-lag'],['tOvNA','วันค้างสถานะซ่อมหลังสุด','ovna-cklag'],
+  ['tNA','วันค้างสถานะ','na-lag'],['tNA','วันค้างสถานะซ่อมหลังสุด','na-cklag'],
+  ['tMNA','วันค้างสถานะ','mna-lag'],['tMNA','วันค้างสถานะซ่อมหลังสุด','mna-cklag'],
+  ['tZM','วันที่ค้างสัญญา','zm-conlag'],['tRJ','วันที่ค้างสัญญา','rj-conlag'],
+  ['tMZM','วันที่ค้างสัญญา','mzm-conlag'],['tMRJ','วันที่ค้างสัญญา','mrj-conlag']
+];
+const LAG_PRESET_RANGE={'1-30':[0,30],'31-60':[31,60],'61-90':[61,90],'90+':[91,'']};
+function lagInitHeads(){
+  LAG_HEADS.forEach(([tid,txt,sid])=>{
+    const tb=document.getElementById(tid);if(!tb)return;
+    const th=[...tb.querySelectorAll('thead th')].find(h=>h.textContent.trim()===txt);
+    if(!th)return;
+    th.classList.add('lagth');th.dataset.lagSel=sid;
+    th.title='คลิกเพื่อกำหนดช่วง'+txt+' (จาก–ถึง กี่วัน)';
+    th.innerHTML=txt+'<span class="lagi">▼</span><span class="lagbadge" style="display:none"></span>';
+    th.addEventListener('click',e=>{e.stopPropagation();lagOpenPop(th,txt,sid);});
+  });
+  document.addEventListener('click',e=>{const p=document.getElementById('lagPop');if(p&&!p.contains(e.target))lagClosePop();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')lagClosePop();});
+}
+function lagRefreshHeads(){
+  document.querySelectorAll('th.lagth').forEach(th=>{
+    const sel=document.getElementById(th.dataset.lagSel);if(!sel)return;
+    const v=sel.value,b=th.querySelector('.lagbadge');if(!b)return;
+    th.classList.toggle('lag-on',!!v);
+    if(!v){b.style.display='none';b.textContent='';return;}
+    const txt=lagCustomText(v)||(v==='never'?'ไม่เคยซ่อม':LAG_LABELS[v]||v);
+    b.textContent=(v.startsWith('c:')?'กำหนดเอง ':'')+txt;b.style.display='block';
+  });
+}
+function lagClosePop(){const p=document.getElementById('lagPop');if(p)p.remove();}
+function lagOpenPop(th,name,sid){
+  lagClosePop();
+  const sel=document.getElementById(sid);if(!sel)return;
+  let lo='',hi='';
+  const cm=/^c:(\d*)-(\d*)$/.exec(sel.value);
+  if(cm){lo=cm[1];hi=cm[2];}else if(LAG_PRESET_RANGE[sel.value]){[lo,hi]=LAG_PRESET_RANGE[sel.value];}
+  const p=document.createElement('div');p.id='lagPop';
+  const isCk=sid.endsWith('cklag');
+  p.innerHTML=`<div class="lp-t">กำหนดช่วง: ${name}</div>
+  <div class="lp-s">ใช้กับตัวกรอง "${name}" ของตารางนี้เท่านั้น${isCk?' · ไม่รวม "ไม่เคยซ่อม"':''}</div>
+  <div class="lp-r">จาก <input id="lpLo" type="number" min="0" step="1" value="${lo}" placeholder="0"> ถึง <input id="lpHi" type="number" min="0" step="1" value="${hi}" placeholder="ไม่จำกัด"> วัน</div>
+  <div class="lp-s">เว้น "ถึง" ว่าง = ตั้งแต่ N วันขึ้นไป · เว้น "จาก" ว่าง = เริ่มที่ 0</div>
+  <div class="lp-e" id="lpErr"></div>
+  <div class="lp-b"><button class="lp-clr">ล้างช่วง</button><button class="lp-x">ยกเลิก</button><button class="lp-ok">ใช้ช่วงนี้</button></div>`;
+  document.body.appendChild(p);
+  const r=th.getBoundingClientRect();
+  const left=Math.max(8,Math.min(window.scrollX+r.left,window.scrollX+document.documentElement.clientWidth-p.offsetWidth-8));
+  p.style.left=left+'px';p.style.top=(window.scrollY+r.bottom+6)+'px';
+  p.addEventListener('click',e=>e.stopPropagation());
+  const apply=()=>{
+    const a=p.querySelector('#lpLo').value.trim(),b=p.querySelector('#lpHi').value.trim();
+    const err=p.querySelector('#lpErr');
+    if((a!==''&&!/^\d+$/.test(a))||(b!==''&&!/^\d+$/.test(b))){err.textContent='กรอกเป็นจำนวนวันเต็ม ≥ 0';return;}
+    if(a===''&&b===''){err.textContent='ใส่อย่างน้อย 1 ช่อง (หรือกด "ล้างช่วง")';return;}
+    if(a!==''&&b!==''&&+a>+b){err.textContent='"จาก" ต้องไม่มากกว่า "ถึง"';return;}
+    const val=`c:${a}-${b}`;
+    let op=[...sel.options].find(o=>o.value===val);
+    if(!op){op=document.createElement('option');op.value=val;sel.appendChild(op);}
+    op.textContent='กำหนดเอง: '+lagCustomText(val);
+    sel.value=val;lagPruneCustom(sel);lagClosePop();
+    sel.dispatchEvent(new Event('change'));
+  };
+  p.querySelector('.lp-ok').onclick=apply;
+  p.querySelector('.lp-x').onclick=lagClosePop;
+  p.querySelector('.lp-clr').onclick=()=>{sel.value='';lagPruneCustom(sel);lagClosePop();sel.dispatchEvent(new Event('change'));};
+  p.addEventListener('keydown',e=>{if(e.key==='Enter')apply();});
+  p.querySelector('#lpLo').focus();
+}
+lagInitHeads();
 </script>
 </body>
 </html>
