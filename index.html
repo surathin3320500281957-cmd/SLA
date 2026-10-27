@@ -237,6 +237,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ov-ck09" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ov-cklag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="ov-cdlag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="ov-ck" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>หมายเหตุ:</label><select id="ov-note" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหมายเหตุ">มีหมายเหตุ</option><option value="ไม่มีหมายเหตุ">ไม่มีหมายเหตุ</option></select>
     <button class="fbtn fbtn-clr" onclick="ovClear()">✕ ล้าง</button>
@@ -313,6 +314,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ovna-ck09" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
     <label>วันค้างสถานะ:</label><select id="ovna-lag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ovna-cklag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="ovna-cdlag" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="ovna-ck" onchange="renOvNA()"><option value="">ทั้งหมด</option></select>
     <label>หมายเหตุ:</label><select id="ovna-note" onchange="renOvNA()"><option value="">ทั้งหมด</option><option value="มีหมายเหตุ">มีหมายเหตุ</option><option value="ไม่มีหมายเหตุ">ไม่มีหมายเหตุ</option></select>
     <button class="fbtn fbtn-clr" onclick="ovnaClear()">✕ ล้าง</button>
@@ -380,6 +382,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="na-ck09" onchange="renNA()"><option value="">ทั้งหมด</option></select>
     <label>วันค้างสถานะ:</label><select id="na-lag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="na-cklag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="na-cdlag" onchange="renNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="na-ck" onchange="renNA()"><option value="">ทั้งหมด</option></select>
     <button class="fbtn fbtn-clr" onclick="naClear()">✕ ล้าง</button>
     <span class="fcnt" id="na-cnt"></span>
@@ -436,6 +439,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>โครงการ:</label><select id="zm-proj" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="zm-ctype" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>วันที่ค้างสัญญา:</label><select id="zm-conlag" onchange="renZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันค้างสถานะเสร็จสิ้น:</label><select id="zm-donelag" onchange="renZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="zm-delivery" onchange="renZM()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="zm-o" onchange="renZM()"><option value="">ทั้งหมด</option></select>
     <label>แจ้งซ่อมเพิ่มเติม:</label><select id="zm-p" onchange="renZM()"><option value="">ทั้งหมด</option></select>
@@ -495,6 +499,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>โครงการ:</label><select id="rj-proj" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="rj-ctype" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>วันที่ค้างสัญญา:</label><select id="rj-conlag" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันค้างสถานะ (AF):</label><select id="rj-aflag" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="rj-delivery" onchange="renRJ()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="rj-o" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
     <label>ใบตอบรับ:</label><select id="rj-p" onchange="renRJ()"><option value="">ทั้งหมด</option></select>
@@ -567,6 +572,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="mna-ck09" onchange="renMNA()"><option value="">ทั้งหมด</option></select>
     <label>วันค้างสถานะ:</label><select id="mna-lag" onchange="renMNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="mna-cklag" onchange="renMNA()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันที่ค้างสัญญา:</label><select id="mna-cdlag" onchange="renMNA()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="mna-ck" onchange="renMNA()"><option value="">ทั้งหมด</option></select>
     <button class="fbtn fbtn-clr" onclick="mnaClear()">✕ ล้าง</button>
     <span class="fcnt" id="mna-cnt"></span>
@@ -623,6 +629,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>โครงการ:</label><select id="mzm-proj" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="mzm-ctype" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
     <label>วันที่ค้างสัญญา:</label><select id="mzm-conlag" onchange="renMZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันค้างสถานะเสร็จสิ้น:</label><select id="mzm-donelag" onchange="renMZM()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="mzm-delivery" onchange="renMZM()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="mzm-o" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
     <label>แจ้งซ่อมเพิ่มเติม:</label><select id="mzm-p" onchange="renMZM()"><option value="">ทั้งหมด</option></select>
@@ -682,6 +689,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>โครงการ:</label><select id="mrj-proj" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
     <label>ประเภทสัญญา:</label><select id="mrj-ctype" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
     <label>วันที่ค้างสัญญา:</label><select id="mrj-conlag" onchange="renMRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันค้างสถานะ (AF):</label><select id="mrj-aflag" onchange="renMRJ()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>สถานะ CT_NotSend:</label><select id="mrj-delivery" onchange="renMRJ()"><option value="">ทั้งหมด</option><option value="พบใน CT_NotSend">พบใน CT_NotSend</option><option value="ไม่พบใน CT_NotSend">ไม่พบใน CT_NotSend</option></select>
     <label>ส่งจดหมาย:</label><select id="mrj-o" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
     <label>ใบตอบรับ:</label><select id="mrj-p" onchange="renMRJ()"><option value="">ทั้งหมด</option></select>
@@ -807,6 +815,7 @@ function lagCustomText(v){
   if(hi!=='')return `ไม่เกิน ${hi} วัน`;
   return 'ทุกช่วง';
 }
+function fieldLag(x,k){const v=x[k];return(v===''||v==null||isNaN(+v))?null:+v;}
 function lagLabel(v){const c=lagCustomText(v);return c?`${c} (กำหนดเอง)`:(LAG_LABELS[v]||v);}
 function lagPruneCustom(sel){
   if(!sel||sel.tagName!=='SELECT')return;
@@ -868,6 +877,7 @@ const OV_CHIP_CFG=[
   ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green','renOv'],
   ['lag','วันค้างสถานะ','orange','renOv',v=>lagLabel(v)],
   ['cklag','วันค้างสถานะซ่อมหลังสุด','orange','renOv',v=>cklagLabel(v)],
+  ['cdlag','วันที่ค้างสัญญา','orange','renOv',v=>lagLabel(v)],
   ['note','หมายเหตุ','blue','renOv'],
 ];
 function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
@@ -880,6 +890,7 @@ function otherChipCfg(pfx,DeptFn,BPFn,RenFn){return [
   ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green',RenFn],
   ['lag','วันค้างสถานะ','orange',RenFn,v=>lagLabel(v)],
   ['cklag','วันค้างสถานะซ่อมหลังสุด','orange',RenFn,v=>cklagLabel(v)],
+  ['cdlag','วันที่ค้างสัญญา','orange',RenFn,v=>lagLabel(v)],
 ];}
 const OVNA_CHIP_CFG=[...otherChipCfg('ovna','ovnaDeptChange','ovnaBPChange','renOvNA'),['note','หมายเหตุ','blue','renOvNA']];
 const NA_CHIP_CFG=[...otherChipCfg('na','naDeptChange','naBPChange','renNA'),['note','หมายเหตุ','blue','renNA',v=>v==='has'?'มีหมายเหตุ':'ไม่มีหมายเหตุ']];
@@ -1025,7 +1036,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
   const ck9=getV('ov-ck09'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),note=getV('ov-note');
-  return AF.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
+  return AF.filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('ov-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -1040,7 +1051,7 @@ function ovBPChange(){
   updSel('ov-proj',uniq(base,'proj'),'');
   renOv();
 }
-function ovClear(){
+function ovClear(){setV('ov-cdlag','');
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');setV('ov-ctype','');
   setV('ov-guarantee','');setV('ov-confirm','');setV('ov-cur','');setV('ov-upd','');
   setV('ov-ck09','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');setV('ov-note','');
@@ -1218,7 +1229,7 @@ function ovnaBase(){return OVNA;}
 function ovnaFiltered(){
   const d=getV('ovna-dept'),b=getV('ovna-bp'),p=getV('ovna-proj'),u=getV('ovna-upd'),ct=getV('ovna-ctype');
   const ck9=getV('ovna-ck09'),lag=getV('ovna-lag'),ck=getV('ovna-ck'),cklag=getV('ovna-cklag'),note=getV('ovna-note');
-  return ovnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
+  return ovnaBase().filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('ovna-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&inLagRange(x.days_lag,lag)&&(!ck||x.ck_custcare_st_grp===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note)));
 }
 function ovnaDeptChange(){
   const d=getV('ovna-dept'),base=d?ovnaBase().filter(x=>x.dept===d):ovnaBase();
@@ -1233,7 +1244,7 @@ function ovnaBPChange(){
   updSel('ovna-upd',uniq(base,'update'),'');updSel('ovna-ck09',uniq(base,'ck_aging09').filter(Boolean),'');
   renOvNA();
 }
-function ovnaClear(){
+function ovnaClear(){setV('ovna-cdlag','');
   ['ovna-dept','ovna-bp','ovna-proj','ovna-ctype','ovna-upd','ovna-ck09','ovna-lag','ovna-ck','ovna-cklag','ovna-note'].forEach(id=>setV(id,''));
   const ob=ovnaBase();
   updSel('ovna-bp',uniq(ob,'bp'),'');updSel('ovna-proj',uniq(ob,'proj'),'');
@@ -1335,7 +1346,7 @@ function naBase(){return NA;}
 function naFiltered(){
   const d=getV('na-dept'),b=getV('na-bp'),p=getV('na-proj'),u=getV('na-upd'),ct=getV('na-ctype');
   const ck9=getV('na-ck09'),lag=getV('na-lag'),ck=getV('na-ck'),cklag=getV('na-cklag'),note=getV('na-note');
-  return naBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='has'?Boolean(x.note):!x.note)));
+  return naBase().filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('na-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='has'?Boolean(x.note):!x.note)));
 }
 function naDeptChange(){
   const d=getV('na-dept'),base=d?naBase().filter(x=>x.dept===d):naBase();
@@ -1350,7 +1361,7 @@ function naBPChange(){
   updSel('na-upd',uniq(base,'update'),'');updSel('na-ck09',uniq(base,'ck_aging09').filter(Boolean),'');
   renNA();
 }
-function naClear(){
+function naClear(){setV('na-cdlag','');
   ['na-dept','na-bp','na-proj','na-ctype','na-upd','na-ck09','na-lag','na-ck','na-cklag','na-note'].forEach(id=>setV(id,''));
   const nb=naBase();
   updSel('na-bp',uniq(nb,'bp'),'');updSel('na-proj',uniq(nb,'proj'),'');
@@ -1458,7 +1469,7 @@ function naSubCounts(){
 function zmFiltered(){
   const d=getV('zm-dept'),b=getV('zm-bp'),p=getV('zm-proj'),ct=getV('zm-ctype');
   const dl=getV('zm-delivery'),o=getV('zm-o'),pp=getV('zm-p'),q=getV('zm-q'),cl=getV('zm-conlag');
-  return ZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl));
+  return ZM.filter(x=>inLagRangeStrict(fieldLag(x,'status_lag'),getV('zm-donelag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl));
 }
 function zmDeptChange(){
   const d=getV('zm-dept');
@@ -1473,7 +1484,7 @@ function zmBPChange(){
   updSel('zm-proj',uniq(base,'proj'),'');
   renZM();
 }
-function zmClear(){
+function zmClear(){setV('zm-donelag','');
   ['zm-dept','zm-bp','zm-proj','zm-ctype','zm-delivery','zm-o','zm-p','zm-q','zm-conlag'].forEach(id=>setV(id,''));
   updSel('zm-bp',uniq(ZM,'bp'),'');updSel('zm-proj',uniq(ZM,'proj'),'');
   renZM();
@@ -1488,6 +1499,7 @@ const ZM_CHIP_CFG=[
   ['p','แจ้งซ่อมเพิ่มเติม','orange','renZM'],
   ['q','นัดรับมอบ','orange','renZM'],
   ['conlag','วันที่ค้างสัญญา','orange','renZM',v=>lagLabel(v)],
+  ['donelag','วันค้างสถานะเสร็จสิ้น','orange','renZM',v=>lagLabel(v)],
 ];
 function renZM(){
   const f=zmFiltered();
@@ -1547,7 +1559,7 @@ function renZM(){
 function rjFiltered(){
   const d=getV('rj-dept'),b=getV('rj-bp'),p=getV('rj-proj'),ct=getV('rj-ctype');
   const dl=getV('rj-delivery'),o=getV('rj-o'),pp=getV('rj-p'),q=getV('rj-q'),cl=getV('rj-conlag'),sc=getV('rj-statuschg');
-  return RJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
+  return RJ.filter(x=>inLagRangeStrict(fieldLag(x,'af_status_lag'),getV('rj-aflag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
 }
 function rjDeptChange(){
   const d=getV('rj-dept');
@@ -1562,7 +1574,7 @@ function rjBPChange(){
   updSel('rj-proj',uniq(base,'proj'),'');
   renRJ();
 }
-function rjClear(){
+function rjClear(){setV('rj-aflag','');
   ['rj-dept','rj-bp','rj-proj','rj-ctype','rj-delivery','rj-o','rj-p','rj-q','rj-conlag','rj-statuschg'].forEach(id=>setV(id,''));
   updSel('rj-bp',uniq(RJ,'bp'),'');updSel('rj-proj',uniq(RJ,'proj'),'');
   renRJ();
@@ -1578,6 +1590,7 @@ const RJ_CHIP_CFG=[
   ['q','ขอส่วนลด','orange','renRJ'],
   ['statuschg','สถานะเปลี่ยนจาก AF','red','renRJ'],
   ['conlag','วันที่ค้างสัญญา','orange','renRJ',v=>lagLabel(v)],
+  ['aflag','วันค้างสถานะ (AF)','orange','renRJ',v=>lagLabel(v)],
 ];
 function renRJ(){
   const f=rjFiltered();
@@ -1643,7 +1656,7 @@ function mnaBase(){return MNA;}
 function mnaFiltered(){
   const d=getV('mna-dept'),b=getV('mna-bp'),p=getV('mna-proj'),u=getV('mna-upd'),ct=getV('mna-ctype');
   const ck9=getV('mna-ck09'),lag=getV('mna-lag'),ck=getV('mna-ck'),cklag=getV('mna-cklag'),note=getV('mna-note');
-  return mnaBase().filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='has'?Boolean(x.note):!x.note)));
+  return mnaBase().filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('mna-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!u||x.update===u)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='has'?Boolean(x.note):!x.note)));
 }
 function mnaDeptChange(){
   const d=getV('mna-dept'),base=d?mnaBase().filter(x=>x.dept===d):mnaBase();
@@ -1658,7 +1671,7 @@ function mnaBPChange(){
   updSel('mna-upd',uniq(base,'update'),'');updSel('mna-ck09',uniq(base,'ck_aging09').filter(Boolean),'');
   renMNA();
 }
-function mnaClear(){
+function mnaClear(){setV('mna-cdlag','');
   ['mna-dept','mna-bp','mna-proj','mna-ctype','mna-upd','mna-ck09','mna-lag','mna-ck','mna-cklag','mna-note'].forEach(id=>setV(id,''));
   const nb=mnaBase();
   updSel('mna-bp',uniq(nb,'bp'),'');updSel('mna-proj',uniq(nb,'proj'),'');
@@ -1766,7 +1779,7 @@ function mnaSubCounts(){
 function mzmFiltered(){
   const d=getV('mzm-dept'),b=getV('mzm-bp'),p=getV('mzm-proj'),ct=getV('mzm-ctype');
   const dl=getV('mzm-delivery'),o=getV('mzm-o'),pp=getV('mzm-p'),q=getV('mzm-q'),cl=getV('mzm-conlag');
-  return MZM.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl));
+  return MZM.filter(x=>inLagRangeStrict(fieldLag(x,'status_lag'),getV('mzm-donelag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl));
 }
 function mzmDeptChange(){
   const d=getV('mzm-dept');
@@ -1781,7 +1794,7 @@ function mzmBPChange(){
   updSel('mzm-proj',uniq(base,'proj'),'');
   renMZM();
 }
-function mzmClear(){
+function mzmClear(){setV('mzm-donelag','');
   ['mzm-dept','mzm-bp','mzm-proj','mzm-ctype','mzm-delivery','mzm-o','mzm-p','mzm-q','mzm-conlag'].forEach(id=>setV(id,''));
   updSel('mzm-bp',uniq(MZM,'bp'),'');updSel('mzm-proj',uniq(MZM,'proj'),'');
   renMZM();
@@ -1796,6 +1809,7 @@ const MZM_CHIP_CFG=[
   ['p','แจ้งซ่อมเพิ่มเติม','orange','renMZM'],
   ['q','นัดรับมอบ','orange','renMZM'],
   ['conlag','วันที่ค้างสัญญา','orange','renMZM',v=>lagLabel(v)],
+  ['donelag','วันค้างสถานะเสร็จสิ้น','orange','renMZM',v=>lagLabel(v)],
 ];
 function renMZM(){
   const f=mzmFiltered();
@@ -1855,7 +1869,7 @@ function renMZM(){
 function mrjFiltered(){
   const d=getV('mrj-dept'),b=getV('mrj-bp'),p=getV('mrj-proj'),ct=getV('mrj-ctype');
   const dl=getV('mrj-delivery'),o=getV('mrj-o'),pp=getV('mrj-p'),q=getV('mrj-q'),cl=getV('mrj-conlag'),sc=getV('mrj-statuschg');
-  return MRJ.filter(x=>(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
+  return MRJ.filter(x=>inLagRangeStrict(fieldLag(x,'af_status_lag'),getV('mrj-aflag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!dl||x.delivery_status===dl)&&(!o||x.o_letter===o)&&(!pp||x.p_extra===pp)&&(!q||x.q_appt===q)&&inLagRangeStrict(contractDateLagDays(x),cl)&&(!sc||(sc==='เปลี่ยนสถานะ'?Boolean(x.af_status&&x.af_status!==x.sheet_status):!(x.af_status&&x.af_status!==x.sheet_status))));
 }
 function mrjDeptChange(){
   const d=getV('mrj-dept');
@@ -1870,7 +1884,7 @@ function mrjBPChange(){
   updSel('mrj-proj',uniq(base,'proj'),'');
   renMRJ();
 }
-function mrjClear(){
+function mrjClear(){setV('mrj-aflag','');
   ['mrj-dept','mrj-bp','mrj-proj','mrj-ctype','mrj-delivery','mrj-o','mrj-p','mrj-q','mrj-conlag','mrj-statuschg'].forEach(id=>setV(id,''));
   updSel('mrj-bp',uniq(MRJ,'bp'),'');updSel('mrj-proj',uniq(MRJ,'proj'),'');
   renMRJ();
@@ -1886,6 +1900,7 @@ const MRJ_CHIP_CFG=[
   ['q','ขอส่วนลด','orange','renMRJ'],
   ['statuschg','สถานะเปลี่ยนจาก AF','red','renMRJ'],
   ['conlag','วันที่ค้างสัญญา','orange','renMRJ',v=>lagLabel(v)],
+  ['aflag','วันค้างสถานะ (AF)','orange','renMRJ',v=>lagLabel(v)],
 ];
 function renMRJ(){
   const f=mrjFiltered();
@@ -2190,6 +2205,14 @@ const LAG_HEADS=[
   ['tMNA','วันค้างสถานะ','mna-lag'],['tMNA','วันค้างสถานะซ่อมหลังสุด','mna-cklag'],
   ['tZM','วันที่ค้างสัญญา','zm-conlag'],['tRJ','วันที่ค้างสัญญา','rj-conlag'],
   ['tMZM','วันที่ค้างสัญญา','mzm-conlag'],['tMRJ','วันที่ค้างสัญญา','mrj-conlag']
+,['tOv','วันที่ค้างสัญญา','ov-cdlag']
+,['tOvNA','วันที่ค้างสัญญา','ovna-cdlag']
+,['tNA','วันที่ค้างสัญญา','na-cdlag']
+,['tMNA','วันที่ค้างสัญญา','mna-cdlag']
+,['tZM','วันค้างสถานะเสร็จสิ้น','zm-donelag']
+,['tMZM','วันค้างสถานะเสร็จสิ้น','mzm-donelag']
+,['tRJ','วันค้างสถานะ (AF)','rj-aflag']
+,['tMRJ','วันค้างสถานะ (AF)','mrj-aflag']
 ];
 const LAG_PRESET_RANGE={'1-30':[0,30],'31-60':[31,60],'61-90':[61,90],'90+':[91,'']};
 function lagInitHeads(){
