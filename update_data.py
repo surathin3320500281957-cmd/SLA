@@ -170,6 +170,26 @@ def extract_update_banner():
     time_display = f'{int(hh):02d}:{mi} น.'
     return {'raw': raw_text, 'date_display': date_display, 'time_display': time_display}
 
+def extract_sheet_dates():
+    """วันที่ข้อมูลของแต่ละ sheet ย่อย จากบรรทัดแรก-สอง (ข้อความที่ตามหลัง "ณ" เช่น "ณ 6-11-69 ") — ถ้าไม่มี = '' (หน้าเว็บจะไม่แสดงป้าย)"""
+    out = {}
+    for key, sh in [('na', SHEET_CK), ('zm', SHEET_ZM), ('rj', SHEET_RJ),
+                    ('mna', SHEET_MNA), ('mzm', SHEET_MZM), ('mrj', SHEET_MRJ)]:
+        try:
+            df_raw = pd.read_excel(EXCEL_FILE, sheet_name=sh, header=None, nrows=2)
+            text = ' '.join(s(v) for v in df_raw.iloc[:2, :6].values.ravel() if s(v))
+        except Exception as e:
+            print(f'⚠️ อ่านวันที่ข้อมูลจาก sheet {sh} ไม่ได้: {e}')
+            text = ''
+        m = re.search(r'ณ\s*(\d{1,2})-(\d{1,2})-(\d{2,4})', text)
+        if m:
+            d, mo, y = m.groups()
+            y = y if len(y) == 4 else '25' + y
+            out[key] = f'{int(d):02d}-{int(mo):02d}-{y}'
+        else:
+            out[key] = ''
+    return out
+
 def build_af():
     df = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_AF, header=2)
     # ⚠️ กันแถวขยะ: บางรอบไฟล์ต้นทางมีแถว header ซ้ำปนมาใน data (CUST_CODE เป็นข้อความ 'CUST_CODE' แทนตัวเลข) — ตัดทิ้งก่อนประมวลผลเสมอ
@@ -426,6 +446,10 @@ def main():
     print(f'=== วันที่อ้างอิง (REF_DATE): {REF_DATE_STR} — ต้องตรงกับ MAX_STATUS_DATE ล่าสุดใน AF ===\n')
 
     update_banner = extract_update_banner()
+    sheet_dates = extract_sheet_dates()
+    print('\n--- วันที่ข้อมูลของแต่ละ sheet ย่อย (ว่าง = ไฟล์ต้นทางไม่ระบุ → ไม่แสดงป้าย) ---')
+    for k, v in sheet_dates.items():
+        print(f'{k}: {v or "-"}' + (f'   (AF: {update_banner["date_display"]})' if v and v != update_banner['date_display'] else ''))
     print(f'=== ป้าย "อัปเดต:" ดึงจากบรรทัดที่ 2 ของ AF sheet: {update_banner["raw"]!r} ===')
     print(f'    -> แสดงผลเป็น: อัปเดต: {update_banner["date_display"]}  {update_banner["time_display"]}\n')
 
@@ -497,6 +521,8 @@ def main():
             json.dump(data, f, ensure_ascii=False)
     with open('UPDATE_BANNER.json', 'w', encoding='utf-8') as f:
         json.dump(update_banner, f, ensure_ascii=False)
+    with open('SHEET_DATES.json', 'w', encoding='utf-8') as f:
+        json.dump(sheet_dates, f, ensure_ascii=False)
     print('\n=== เขียนไฟล์ AF_new.json / NA_new.json / MN_new.json / ZM_new.json / RJ_new.json / UPDATE_BANNER.json เรียบร้อย ===')
     print('=== ตรวจสอบตัวเลขข้างบนให้ครบตามรายงานสรุปมาตรฐาน (README 9.1) ก่อน integrate เข้า index.html ===')
 

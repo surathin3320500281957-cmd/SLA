@@ -37,6 +37,8 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t1);font-
   display:flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0;}
 .tbtn:hover{color:var(--blu);background:#EEF4FF;}
 .tbtn.on{color:#fff;background:var(--pur);border-bottom-color:var(--pur);border-radius:10px 10px 0 0;font-weight:700;}
+.dbadge{display:block;width:fit-content;margin:0 0 6px auto;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;border-radius:14px;padding:3px 12px;font-size:12.5px;font-weight:600;}
+.dbadge.old{background:#FFF7ED;color:#C2410C;border-color:#FDBA74;}
 /* ── หัวคอลัมน์วันค้างที่คลิกกำหนดช่วงได้ ── */
 th.lagth{cursor:pointer;user-select:none;position:relative;}
 th.lagth:hover{filter:brightness(.93);}
@@ -366,6 +368,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <button class="stbtn" onclick="naSub(3,this)">🔨 ประสงค์ขอส่วนลด <span class="pill" id="na-sub-cnt-3">0</span></button>
   </div>
   <div class="na-subview on" id="na-sub1">
+  <div class="dbadge" id="db-na" style="display:none"></div>
   <div class="wban"><span style="font-size:22px;">⚠️</span><div>
     <h4>รายการ "ไม่ดำเนินการ(สคล/สคจ ชี้แจง)" — ต้องติดตาม</h4>
     <p>เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "สำหรับกรอง-ตรวจสอบ" | คอลัมน์ "ปรับสรุปการ UPDATE"</p>
@@ -427,6 +430,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
   </div>
 
   <div class="na-subview" id="na-sub2">
+  <div class="dbadge" id="db-zm" style="display:none"></div>
   <div class="wban"><span style="font-size:22px;">✅</span><div>
     <h4>รายการ "ดำเนินการเสร็จสิ้น" — รอบันทึกส่งมอบในระบบ F/E</h4>
     <p>เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "ซ่อมเสร็จ" | join กับ AF (CT_NotSend) เพื่อเช็คว่าพบ/ไม่พบในลิสต์สัญญายังไม่ส่งมอบ</p>
@@ -487,6 +491,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
   </div>
 
   <div class="na-subview" id="na-sub3">
+  <div class="dbadge" id="db-rj" style="display:none"></div>
   <div class="wban"><span style="font-size:22px;">🔨</span><div>
     <h4>รายการ "ประสงค์ขอส่วนลด"</h4>
     <p>เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "รอจัดจ้าง" | ไม่ join AF (แสดงข้อมูลจาก sheet ตรงๆ)</p>
@@ -556,6 +561,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <button class="stbtn" onclick="mnaSub(3,this)">🔨 ประสงค์ขอส่วนลด(หน่วยงานอื่น) <span class="pill" id="mna-sub-cnt-3">0</span></button>
   </div>
   <div class="mna-subview on" id="mna-sub1">
+  <div class="dbadge" id="db-mna" style="display:none"></div>
   <div class="wban"><span style="font-size:22px;">⚠️</span><div>
     <h4>รายการ "ไม่ดำเนินการ(หน่วยงานอื่น)" — ต้องติดตาม</h4>
     <p>เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "หน่วยอื่นไม่ดำเนินงาน" | คอลัมน์ "ปรับสรุปการ UPDATE"</p>
@@ -617,6 +623,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
   </div>
 
   <div class="mna-subview" id="mna-sub2">
+  <div class="dbadge" id="db-mzm" style="display:none"></div>
   <div class="wban"><span style="font-size:22px;">✅</span><div>
     <h4>รายการ "ดำเนินการเสร็จสิ้น(หน่วยงานอื่น)" — รอบันทึกส่งมอบในระบบ F/E</h4>
     <p>เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "หน่วยอื่นซ่อมเสร็จ" | join กับ AF (CT_NotSend) เพื่อเช็คว่าพบ/ไม่พบในลิสต์สัญญายังไม่ส่งมอบ</p>
@@ -677,6 +684,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
   </div>
 
   <div class="mna-subview" id="mna-sub3">
+  <div class="dbadge" id="db-mrj" style="display:none"></div>
   <div class="wban"><span style="font-size:22px;">🔨</span><div>
     <h4>รายการ "ประสงค์ขอส่วนลด(หน่วยงานอื่น)"</h4>
     <p>เชื่อมข้อมูลผ่านรหัสลูกค้า → sheet "หน่วยอื่นขอลดค่าซ่อม" | join กับ AF (CT_NotSend) เพื่อเช็คว่าพบ/ไม่พบในลิสต์สัญญายังไม่ส่งมอบ</p>
@@ -772,6 +780,7 @@ const SS=Object.keys(SC), UU=Object.keys(UC);
 const STAGES11=['รับคำร้องแจ้งซ่อม','สำรวจซ่อม','ยืนยันการสำรวจซ่อม','ประมาณราคา','ตรวจสอบและรับรองราคา','อนุมัติสรุปค่าก่อสร้าง','รอการจัดจ้าง','จัดหาผู้รับจ้าง','ดำเนินการซ่อม','ดำเนินการเสร็จสิ้น','ขอเบิกเงินค่าจ้าง'];
 // ป้าย "อัปเดต:" — ดึงจากบรรทัดที่ 2 (แถวที่ 2 คอลัมน์ A) ของ AF sheet เสมอ ผ่าน extract_update_banner() ใน update_data.py ห้ามพิมพ์วันที่เอง
 const UPDATE_BANNER={date:"11-11-2569",time:"14:20 น.",raw:"สัญญายังไม่บันทึกส่งมอบในระบบ F/E (CT_NOTSEND_CUSTCARE  ณ 11-11-69  14:20  น)"};
+const SHEET_DATES={"na":"06-11-2569","zm":"06-11-2569","rj":"06-11-2569","mna":"","mzm":"","mrj":""}; // วันที่ข้อมูลแต่ละแท็บย่อย (update_data.py → SHEET_DATES.json)
 function updateBannerText(){return `อัปเดต: ${UPDATE_BANNER.date}  ${UPDATE_BANNER.time}`;}
 const STAGES12=[...STAGES11,'ไม่ดำเนินการ']; // 11 สถานะ + "ไม่ดำเนินการ" สำหรับ filter สถานะซ่อมปัจจุบัน (ov-cur)
 const DONE_MERGED='เสร็จสิ้น (รวม)'; // ตัวเลือกที่ 13 ใน ov-cur: รวม "ดำเนินการเสร็จสิ้น" + "ขอเบิกเงินค่าจ้าง" (ในทางปฏิบัติถือว่าเสร็จเหมือนกัน แต่เก็บข้อมูลแยก)
@@ -2278,6 +2287,20 @@ function lagOpenPop(th,name,sid){
   p.querySelector('#lpLo').focus();
 }
 lagInitHeads();
+
+// ═══ วันที่ข้อมูลของแต่ละแท็บย่อย (SHEET_DATES จาก update_data.py; ว่าง = ไม่แสดง) ═══
+function parseDmyBE(s){const m=/^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(s||'');return m?new Date(+m[3]-543,+m[2]-1,+m[1]):null;}
+function renderSheetDates(){
+  const af=parseDmyBE(UPDATE_BANNER.date);
+  Object.keys(SHEET_DATES).forEach(k=>{
+    const el=document.getElementById('db-'+k);if(!el)return;
+    const v=SHEET_DATES[k];if(!v){el.style.display='none';return;}
+    const d=parseDmyBE(v);let txt='📅 ข้อมูล ณ '+v,old=false;
+    if(d&&af){const diff=Math.round((af-d)/86400000);if(diff>0){txt+=' (เก่ากว่า AF '+diff+' วัน)';old=true;}}
+    el.textContent=txt;el.className='dbadge'+(old?' old':'');el.style.display='block';
+  });
+}
+renderSheetDates();
 </script>
 </body>
 </html>
