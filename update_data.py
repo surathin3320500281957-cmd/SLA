@@ -259,7 +259,7 @@ def build_na(af_by_cust, na_fields):
             rec = {k: '' for k in na_fields}
             rec.update({
                 'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
-                'house': s(r.get('บ้านเลขที่')), 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
+                'house': (KNOWN_HOUSE_FIXES[cust] if cust in KNOWN_HOUSE_FIXES and house_corrupted(s(r.get('บ้านเลขที่'))) else s(r.get('บ้านเลขที่'))), 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
                 'change_status': s(r.get('CHANGE_STATUS')), 'status': upd, 'update': upd,
                 'confirm_flag': s(r.get('CONFIRM_FLAG')), 'next_custcare': upd,
                 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
@@ -356,7 +356,7 @@ def build_mna(af_by_cust, na_fields):
             rec = {k: '' for k in na_fields}
             rec.update({
                 'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
-                'house': s(r.get('บ้านเลขที่')), 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
+                'house': (KNOWN_HOUSE_FIXES[cust] if cust in KNOWN_HOUSE_FIXES and house_corrupted(s(r.get('บ้านเลขที่'))) else s(r.get('บ้านเลขที่'))), 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
                 'change_status': s(r.get('CHANGE_STATUS')), 'status': upd, 'update': upd,
                 'confirm_flag': s(r.get('CONFIRM_FLAG')), 'next_custcare': upd,
                 'ck_custcare_st_grp': 'ไม่เคยซ่อม',
