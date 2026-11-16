@@ -235,6 +235,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>การค้ำประกัน:</label><select id="ov-guarantee" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>การซ่อม:</label><select id="ov-confirm" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>สถานะซ่อมปัจจุบัน:</label><select id="ov-cur" onchange="renOv()"><option value="">ทั้งหมด</option></select>
+    <label>NEXT_CUSTCARE:</label><select id="ov-next" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ปรับสรุปการ UPDATE:</label><select id="ov-upd" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>ช่วงวันรอจัดหาผู้รับจ้าง:</label><select id="ov-ck09" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
@@ -631,6 +632,7 @@ const OV_CHIP_CFG=[
   ['guarantee','การค้ำประกัน','green','renOv'],
   ['confirm','การซ่อม','green','renOv'],
   ['cur','สถานะซ่อมปัจจุบัน','green','renOv'],
+  ['next','NEXT_CUSTCARE','green','renOv'],
   ['upd','ปรับสรุปการ UPDATE','green','renOv'],
   ['ck','เช็คสถานะซ่อมหลังสุด','green','renOv'],
   ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green','renOv'],
@@ -797,7 +799,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
   const ck9=getV('ov-ck09'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),note=getV('ov-note');
-  return AF.filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('ov-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note))&&(!getV('ov-doc1')||(getV('ov-doc1')==='มี'?Boolean(x.doc_no1):!x.doc_no1))&&(!getV('ov-doc2')||(getV('ov-doc2')==='มี'?Boolean(x.doc_no2):!x.doc_no2)));
+  return AF.filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('ov-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note))&&(!getV('ov-next')||x.next_custcare===getV('ov-next'))&&(!getV('ov-doc1')||(getV('ov-doc1')==='มี'?Boolean(x.doc_no1):!x.doc_no1))&&(!getV('ov-doc2')||(getV('ov-doc2')==='มี'?Boolean(x.doc_no2):!x.doc_no2)));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -812,7 +814,7 @@ function ovBPChange(){
   updSel('ov-proj',uniq(base,'proj'),'');
   renOv();
 }
-function ovClear(){setV('ov-cdlag','');setV('ov-doc1','');setV('ov-doc2','');
+function ovClear(){setV('ov-cdlag','');setV('ov-doc1','');setV('ov-doc2','');setV('ov-next','');
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');setV('ov-ctype','');
   setV('ov-guarantee','');setV('ov-confirm','');setV('ov-cur','');setV('ov-upd','');
   setV('ov-ck09','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');setV('ov-note','');
@@ -1508,7 +1510,7 @@ function initDDs(){
   updSel('ov-dept',uniq(AF,'dept'),'');updSel('ov-bp',uniq(AF,'bp'),'');updSel('ov-proj',uniq(AF,'proj'),'');
   updSel('ov-ctype',uniq(AF,'contract_type').filter(Boolean),'');
   updSel('ov-guarantee',uniq(AF,'guarantee').filter(Boolean),'');updSel('ov-confirm',uniq(AF,'confirm_flag').filter(Boolean),'');
-  updSel('ov-cur',STAGES12,'');
+  updSel('ov-cur',STAGES12,'');updSel('ov-next',uniq(AF,'next_custcare').filter(Boolean),'');
   {const opt=document.createElement('option');opt.value=DONE_MERGED;opt.textContent=DONE_MERGED;document.getElementById('ov-cur').appendChild(opt);}
   updSel('ov-upd',[...new Set(AF.map(updSummary).filter(Boolean))].sort(),'');
   updSel('ov-ck09',uniq(AF,'ck_aging09').filter(Boolean),'');updSel('ov-ck',[...new Set(AF.map(ckStatus).filter(Boolean))].sort(),'');
