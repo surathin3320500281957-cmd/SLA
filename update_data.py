@@ -4,7 +4,7 @@ update_data.py — สคริปต์แปลงข้อมูล Excel →
 วิธีใช้:
     1. แก้ตัวแปร EXCEL_FILE, REF_DATE_STR ด้านล่างให้ตรงกับไฟล์/วันที่ที่จะอัปเดต
     2. รัน: python3 update_data.py
-    3. สคริปต์จะสร้างไฟล์ AF_new.json / NA_new.json / MN_new.json / ZM_new.json / RJ_new.json
+    3. สคริปต์จะสร้างไฟล์ AF_new.json / NA_new.json / MNA_new.json / UPDATE_BANNER.json / SHEET_DATES.json
        พร้อมพิมพ์รายงานสรุปมาตรฐาน (ตาม README หัวข้อ 9.1) ออกทางหน้าจอ
     4. ตรวจสอบตัวเลขในรายงานให้ตรงกับที่คาดไว้ก่อน แล้วค่อยเขียนทับ AF/NA/ZM/RJ/MNA/MZM/MRJ ใน index.html
        (การ integrate เข้า index.html แนะนำให้ทำแยกเป็นอีกขั้นตอน ไม่ auto-write ในสคริปต์นี้
@@ -41,13 +41,9 @@ OLD_INDEX_HTML = '/home/claude/index.html'  # ไฟล์ dashboard เดิ�
 # ชื่อ sheet ปัจจุบัน — เคยเปลี่ยนมาแล้ว 1 ครั้ง (รอจัดจ้าง → ขอลดค่าซ่อม) เช็คชื่อ sheet จริงก่อนรันเสมอ
 SHEET_AF = 'AF'
 SHEET_CK = 'สำหรับกรอง-ตรวจสอบ'   # → NA, และ note ของ AF
-SHEET_ZM = 'ซ่อมเสร็จ'            # → ZM (ดำเนินการเสร็จสิ้น)
-SHEET_RJ = 'ขอลดค่าซ่อม'          # → RJ (ประสงค์ขอส่วนลด) — เดิมชื่อ "รอจัดจ้าง"
 
 # ── ข้อมูลหน่วยงานอื่น (main tab ใหม่ 25-08-69) — header row 4 (header=3) ทั้ง 3 sheet
 SHEET_MNA = 'หน่วยอื่นไม่ดำเนินงาน'   # → MNA (ไม่ดำเนินการ(หน่วยงานอื่น))
-SHEET_MZM = 'หน่วยอื่นซ่อมเสร็จ'      # → MZM (ดำเนินการเสร็จสิ้น(หน่วยงานอื่น))
-SHEET_MRJ = 'หน่วยอื่นขอลดค่าซ่อม'    # → MRJ (ประสงค์ขอส่วนลด(หน่วยงานอื่น))
 # ⚠️ guarantee ของ 3 sheet นี้อยู่ในคอลัมน์ 'CONSTRUCTION_AGENCY.1' (ไม่ใช่ 'ST_GUARANTEE' แบบ ZM/RJ เดิม) — เช็คทุกรอบ
 
 REF = datetime.date.fromisoformat(REF_DATE_STR)
@@ -173,8 +169,7 @@ def extract_update_banner():
 def extract_sheet_dates():
     """วันที่ข้อมูลของแต่ละ sheet ย่อย จากบรรทัดแรก-สอง (ข้อความที่ตามหลัง "ณ" เช่น "ณ 6-11-69 ") — ถ้าไม่มี = '' (หน้าเว็บจะไม่แสดงป้าย)"""
     out = {}
-    for key, sh in [('na', SHEET_CK), ('zm', SHEET_ZM), ('rj', SHEET_RJ),
-                    ('mna', SHEET_MNA), ('mzm', SHEET_MZM), ('mrj', SHEET_MRJ)]:
+    for key, sh in [('na', SHEET_CK), ('mna', SHEET_MNA)]:
         try:
             df_raw = pd.read_excel(EXCEL_FILE, sheet_name=sh, header=None, nrows=2)
             text = ' '.join(s(v) for v in df_raw.iloc[:2, :6].values.ravel() if s(v))
@@ -290,74 +285,10 @@ def build_na(af_by_cust, na_fields):
     return na_new, found_cnt, not_found_cnt
 
 
-# ═══════════════════════════════════════════════════════════
-# 4) ZM (ดำเนินการเสร็จสิ้น) และ RJ (ประสงค์ขอส่วนลด)
-# ═══════════════════════════════════════════════════════════
-def build_zm_rj_base(sheet, p_col, af_by_cust, q_col='นัดรับมอบ'):
-    df = pd.read_excel(EXCEL_FILE, sheet_name=sheet, header=3)
-    recs = []
-    for _, r in df.iterrows():
-        cust = s(int(r['รหัสลูกค้า'])) if pd.notna(r['รหัสลูกค้า']) else ''
-        if not cust:
-            continue
-        af_r = af_by_cust.get(cust)
-        house = s(r.get('บ้านเลขที่'))
-        if cust in KNOWN_HOUSE_FIXES and house_corrupted(house):
-            house = KNOWN_HOUSE_FIXES[cust]
-        rec = {
-            'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
-            'house': house, 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
-            'start_con': safe_start_con(r.get('วันที่ทำสัญญา')),
-            'due_first': safe_yyyymmdd_or_text(r.get('วันที่นัด\nส่งมอบครั้งแรก')),
-            'due_new': yyyymmdd_dmy_be(r.get('วันที่นัด\nส่งมอบครั้งใหม่')),
-            'change_status': safe_yyyymmdd_or_text(r.get('CHANGE_STATUS')),
-            'agency': s(r.get('CONSTRUCTION_AGENCY')),
-            'guarantee': s(r.get('ST_GUARANTEE')),   # ⚠️ ชื่อคอลัมน์เปลี่ยนจาก CONSTRUCTION_AGENCY.1 แล้ว
-            'o_letter': s(r.get('ส่งจดหมาย')), 'p_extra': s(r.get(p_col)), 'q_appt': s(r.get(q_col)),
-            'note': s(r.get('หมายเหตุ')),
-            'sheet_custcare_status': s(r.get('CUSTCARE_STATUS_NAME')),  # ห้าม hardcode! อ่านค่าจริงเสมอ
-            'contract_type': af_r.get('contract_type', '') if af_r else '',
-            'contract_date': af_r.get('contract_date', '') if af_r else '',
-            'delivery_status': 'พบใน CT_NotSend' if af_r else 'ไม่พบใน CT_NotSend',
-        }
-        recs.append((rec, af_r))
-    return recs
-
-def build_zm_rj_base_v2(sheet, p_col, af_by_cust, q_col, guarantee_col='ST_GUARANTEE'):
-    """เหมือน build_zm_rj_base ทุกประการ แต่รองรับชื่อคอลัมน์ guarantee ที่ต่างกันได้
-    (sheet 'หน่วยอื่น...' ใช้ 'CONSTRUCTION_AGENCY.1' แทน 'ST_GUARANTEE')"""
-    df = pd.read_excel(EXCEL_FILE, sheet_name=sheet, header=3)
-    recs = []
-    for _, r in df.iterrows():
-        cust = s(int(r['รหัสลูกค้า'])) if pd.notna(r['รหัสลูกค้า']) else ''
-        if not cust:
-            continue
-        af_r = af_by_cust.get(cust)
-        house = s(r.get('บ้านเลขที่'))
-        if cust in KNOWN_HOUSE_FIXES and house_corrupted(house):
-            house = KNOWN_HOUSE_FIXES[cust]
-        rec = {
-            'dept': s(r.get('กอง')), 'bp': s(r.get('สำนักงาน')), 'proj': s(r.get('โครงการ')),
-            'house': house, 'cust': cust, 'cust_name': s(r.get('ชื่อลูกค้า')),
-            'start_con': safe_start_con(r.get('วันที่ทำสัญญา')),
-            'due_first': safe_yyyymmdd_or_text(r.get('วันที่นัด\nส่งมอบครั้งแรก')),
-            'due_new': yyyymmdd_dmy_be(r.get('วันที่นัด\nส่งมอบครั้งใหม่')),
-            'change_status': safe_yyyymmdd_or_text(r.get('CHANGE_STATUS')),
-            'agency': s(r.get('CONSTRUCTION_AGENCY')),
-            'guarantee': s(r.get(guarantee_col)),
-            'o_letter': s(r.get('ส่งจดหมาย')), 'p_extra': s(r.get(p_col)), 'q_appt': s(r.get(q_col)),
-            'note': s(r.get('หมายเหตุ')),
-            'sheet_custcare_status': s(r.get('CUSTCARE_STATUS_NAME')),
-            'contract_type': af_r.get('contract_type', '') if af_r else '',
-            'contract_date': af_r.get('contract_date', '') if af_r else '',
-            'delivery_status': 'พบใน CT_NotSend' if af_r else 'ไม่พบใน CT_NotSend',
-        }
-        recs.append((rec, af_r))
-    return recs
 
 
 # ═══════════════════════════════════════════════════════════
-# 5) ข้อมูลหน่วยงานอื่น — MNA / MZM / MRJ (main tab ใหม่, โครงสร้างเดียวกับ NA/ZM/RJ)
+# 5) ข้อมูลหน่วยงานอื่น — MNA (เหลือเฉพาะแท็บ ไม่ดำเนินการ — ลบ ZM/RJ/MZM/MRJ แล้ว 16-11-69) (main tab ใหม่, โครงสร้างเดียวกับ NA/ZM/RJ)
 # ═══════════════════════════════════════════════════════════
 def build_mna(af_by_cust, na_fields):
     df_ck = pd.read_excel(EXCEL_FILE, sheet_name=SHEET_MNA, header=3)
@@ -386,56 +317,6 @@ def build_mna(af_by_cust, na_fields):
         mna_new.append(rec)
     return mna_new, found_cnt, not_found_cnt
 
-def build_mzm(af_by_cust):
-    pairs = build_zm_rj_base_v2(SHEET_MZM, 'แจ้งซ่อมเพิ่มเติม', af_by_cust, q_col='นัดรับมอบ', guarantee_col='CONSTRUCTION_AGENCY.1')
-    MZM = []
-    for rec, af_r in pairs:
-        sl = status_lag(af_r)
-        rec['status_lag'] = str(sl) if sl is not None else ''
-        del rec['sheet_custcare_status']
-        MZM.append(rec)
-    return MZM
-
-def build_mrj(af_by_cust):
-    pairs = build_zm_rj_base_v2(SHEET_MRJ, 'ใบตอบรับ', af_by_cust, q_col='ขอส่วนลด', guarantee_col='CONSTRUCTION_AGENCY.1')
-    MRJ = []
-    for rec, af_r in pairs:
-        rec['sheet_status'] = rec.pop('sheet_custcare_status')
-        if af_r:
-            rec['af_status'] = af_r.get('update', '')
-            sl = status_lag(af_r)
-            rec['af_status_lag'] = str(sl) if sl is not None else ''
-        else:
-            rec['af_status'] = ''
-            rec['af_status_lag'] = ''
-        MRJ.append(rec)
-    return MRJ
-
-
-def build_zm(af_by_cust):
-    pairs = build_zm_rj_base(SHEET_ZM, 'แจ้งซ่อมเพิ่มเติม', af_by_cust)
-    ZM = []
-    for rec, af_r in pairs:
-        sl = status_lag(af_r)
-        rec['status_lag'] = str(sl) if sl is not None else ''
-        del rec['sheet_custcare_status']  # ZM ไม่ใช้ฟิลด์นี้
-        ZM.append(rec)
-    return ZM
-
-def build_rj(af_by_cust):
-    pairs = build_zm_rj_base(SHEET_RJ, 'ใบตอบรับ', af_by_cust, q_col='ขอส่วนลด')
-    RJ = []
-    for rec, af_r in pairs:
-        rec['sheet_status'] = rec.pop('sheet_custcare_status')  # ← อ่านจาก sheet จริง ไม่ hardcode
-        if af_r:
-            rec['af_status'] = af_r.get('update', '')
-            sl = status_lag(af_r)
-            rec['af_status_lag'] = str(sl) if sl is not None else ''
-        else:
-            rec['af_status'] = ''
-            rec['af_status_lag'] = ''
-        RJ.append(rec)
-    return RJ
 
 
 # ═══════════════════════════════════════════════════════════
@@ -460,26 +341,12 @@ def main():
     NA, na_found, na_not_found = build_na(af_by_cust, list(AF[0].keys()))
     print(f'NA: {len(NA)} รายการ | พบใน AF: {na_found} | ไม่พบ: {na_not_found}')
 
-    ZM = build_zm(af_by_cust)
-    zm_delivered = sum(1 for r in ZM if r['delivery_status'] == 'ไม่พบใน CT_NotSend')
-    print(f'ZM: {len(ZM)} รายการ | ไม่พบใน CT_NotSend(หลุดจาก AF): {zm_delivered}')
-
-    RJ = build_rj(af_by_cust)
-    rj_changed = sum(1 for r in RJ if r['af_status'] and r['af_status'] != r['sheet_status'])
-    print(f'RJ: {len(RJ)} รายการ | สถานะเปลี่ยนจาก sheet_status แล้ว: {rj_changed}')
-
     MNA, mna_found, mna_not_found = build_mna(af_by_cust, list(AF[0].keys()))
     print(f'MNA (ไม่ดำเนินการ หน่วยงานอื่น): {len(MNA)} รายการ | พบใน AF: {mna_found} | ไม่พบ: {mna_not_found}')
 
-    MZM = build_mzm(af_by_cust)
-    print(f'MZM (ดำเนินการเสร็จสิ้น หน่วยงานอื่น): {len(MZM)} รายการ')
-
-    MRJ = build_mrj(af_by_cust)
-    print(f'MRJ (ประสงค์ขอส่วนลด หน่วยงานอื่น): {len(MRJ)} รายการ')
-
     # ⚠️ เช็ครหัสลูกค้า (join key) ไม่ซ้ำ + join AF — กันเคสรหัสถูกปัดเป็น 200000000 ในไฟล์ต้นทาง (เจอ 21-9-69: ผ่าน "เป็นตัวเลข" แต่เหลือ 2 ค่า)
     print('\n--- เช็ครหัสลูกค้าไม่ซ้ำ (distinct = จำนวนแถว ถ้าปกติ) + join AF ---')
-    for name, arr in [('NA', NA), ('ZM', ZM), ('RJ', RJ), ('MNA', MNA), ('MZM', MZM), ('MRJ', MRJ)]:
+    for name, arr in [('NA', NA), ('MNA', MNA)]:
         distinct = len({r['cust'] for r in arr})
         in_af = sum(1 for r in arr if r['cust'] in af_by_cust)
         flag = '' if distinct == len(arr) else '  ❌ รหัสซ้ำ/เพี้ยน — หยุด ตรวจไฟล์ต้นทางก่อน integrate'
@@ -487,7 +354,7 @@ def main():
 
     # เช็คบ้านเลขที่เพี้ยน
     print('\n--- เช็คบ้านเลขที่เพี้ยนเป็นวันที่ ---')
-    for name, arr in [('AF', AF), ('NA', NA), ('ZM', ZM), ('RJ', RJ), ('MNA', MNA), ('MZM', MZM), ('MRJ', MRJ)]:
+    for name, arr in [('AF', AF), ('NA', NA), ('MNA', MNA)]:
         bad = [(r['cust'], r['house']) for r in arr if house_corrupted(r.get('house', ''))]
         print(f'{name}: {len(bad)} จุด' + (f' -> {bad}' if bad else ''))
         if bad:
@@ -515,15 +382,14 @@ def main():
         print(f'\n(ข้ามการเทียบกับไฟล์เดิม: {e})')
 
     # เขียนไฟล์ผลลัพธ์
-    for name, data in [('AF', AF), ('NA', NA), ('ZM', ZM), ('RJ', RJ),
-                        ('MNA', MNA), ('MZM', MZM), ('MRJ', MRJ)]:
+    for name, data in [('AF', AF), ('NA', NA), ('MNA', MNA)]:
         with open(f'{name}_new.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
     with open('UPDATE_BANNER.json', 'w', encoding='utf-8') as f:
         json.dump(update_banner, f, ensure_ascii=False)
     with open('SHEET_DATES.json', 'w', encoding='utf-8') as f:
         json.dump(sheet_dates, f, ensure_ascii=False)
-    print('\n=== เขียนไฟล์ AF_new.json / NA_new.json / MN_new.json / ZM_new.json / RJ_new.json / UPDATE_BANNER.json เรียบร้อย ===')
+    print('\n=== เขียนไฟล์ AF_new.json / NA_new.json / MNA_new.json / UPDATE_BANNER.json / SHEET_DATES.json เรียบร้อย ===')
     print('=== ตรวจสอบตัวเลขข้างบนให้ครบตามรายงานสรุปมาตรฐาน (README 9.1) ก่อน integrate เข้า index.html ===')
 
 
