@@ -239,6 +239,9 @@ def build_af():
             'guarantee': s(r.get('ST_GUARANTEE')), 'confirm_flag': s(r.get('CONFIRM_FLAG')),
             'next_custcare': s(r.get('NEXT_CUSTCARE')),
             'contract_date': yyyymmdd_dmy_be(r.get('CONTRACT_DATE')),
+            # หนังสือแจ้ง (เพิ่ม 16-11-69): วันออกหนังสือ/เลขที่หนังสือ ครั้งที่ 1-2 — อ่านตามชื่อคอลัมน์ ถ้าไม่มีคอลัมน์ = ''
+            'send_date1': yyyymmdd_dmy_be(r.get('SEND_DATE1')), 'doc_no1': s(r.get('DOC_NO1')),
+            'send_date2': yyyymmdd_dmy_be(r.get('SEND_DATE2')), 'doc_no2': s(r.get('DOC_NO2')),
             'days_lag': days_lag,
             'ck_custcare_st': ck_raw, 'ck_custcare_st_grp': ck_grp,
             'd01': dt_dmy_be(r.get('DATE_01')), 'd02': dt_dmy_be(r.get('DATE_02')), 'd03': dt_dmy_be(r.get('DATE_03')),
