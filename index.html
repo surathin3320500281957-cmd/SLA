@@ -241,6 +241,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
     <label>วันค้างสถานะ:</label><select id="ov-lag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันค้างสถานะซ่อมหลังสุด:</label><select id="ov-cklag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="never">ไม่เคยซ่อม</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>วันที่ค้างสัญญา:</label><select id="ov-cdlag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
+    <label>วันค้างรับคำร้องแจ้งซ่อม:</label><select id="ov-rqlag" onchange="renOv()"><option value="">ทั้งหมด</option><option value="1-30">0-30 วัน</option><option value="31-60">31-60 วัน</option><option value="61-90">61-90 วัน</option><option value="90+">เกิน 90 วัน</option></select>
     <label>เช็คสถานะซ่อมหลังสุด:</label><select id="ov-ck" onchange="renOv()"><option value="">ทั้งหมด</option></select>
     <label>หมายเหตุ:</label><select id="ov-note" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มีหมายเหตุ">มีหมายเหตุ</option><option value="ไม่มีหมายเหตุ">ไม่มีหมายเหตุ</option></select>
     <label>เลขที่หนังสือครั้งที่ 1:</label><select id="ov-doc1" onchange="renOv()"><option value="">ทั้งหมด</option><option value="มี">มี</option><option value="ไม่มี">ไม่มี</option></select>
@@ -297,6 +298,7 @@ tr.grand td{background:#C8D9F5 !important;font-weight:700;color:#0F2B6F;border-t
       <th class="hg" style="background:#EDE9FE;border-right:2px solid #7C3AED;">ขอเบิกเงินค่าจ้าง</th>
       <th class="ht">วันรอจัดหาผู้รับจ้าง</th><th class="ht">ช่วงวันรอจัดหาผู้รับจ้าง</th>
       <th class="ht" style="color:#DC2626;">วันค้างสถานะ</th><th class="ht" style="color:#B91C1C;">วันค้างสถานะซ่อมหลังสุด</th>
+      <th class="ho">วันค้างรับคำร้องแจ้งซ่อม</th>
       <th class="ho">หมายเหตุ</th>
       <th class="ht">วันออกหนังสือครั้งที่ 1</th><th class="ho">เลขที่หนังสือครั้งที่ 1</th>
       <th class="ht">วันออกหนังสือครั้งที่ 2</th><th class="ho">เลขที่หนังสือครั้งที่ 2</th>
@@ -609,6 +611,14 @@ function contractDateLagDays(x){
   const diff=Math.round((UPD_REF_DATE-dt)/86400000);
   return diff>=0?diff:null;
 }
+// วันค้างรับคำร้องแจ้งซ่อม = วันอ้างอิง − วันที่ในสถานะ "รับคำร้องแจ้งซ่อม" (d01) — ทุกแถวที่มี d01 (ไม่ขึ้นกับว่าตอนนี้อยู่สถานะไหน)
+function reqLagDays(x){const dt=parseDMY(x.d01);if(!dt)return null;const v=Math.round((UPD_REF_DATE-dt)/86400000);return v<0?null:v;}
+function reqLagTd(x){
+  const v=reqLagDays(x);
+  if(v===null)return'<td style="text-align:right;color:var(--t4);">—</td>';
+  const color=v>90?'#DC2626':v>60?'#D97706':'#059669';
+  return`<td style="text-align:right;font-weight:700;color:${color};">${v}</td>`;
+}
 function conDateLagTd(x){
   const v=contractDateLagDays(x);
   if(v===null)return'<td style="text-align:right;color:var(--t4);">—</td>';
@@ -633,6 +643,7 @@ const OV_CHIP_CFG=[
   ['confirm','การซ่อม','green','renOv'],
   ['cur','สถานะซ่อมปัจจุบัน','green','renOv'],
   ['next','NEXT_CUSTCARE','green','renOv'],
+  ['rqlag','วันค้างรับคำร้องแจ้งซ่อม','orange','renOv',v=>lagLabel(v)],
   ['upd','ปรับสรุปการ UPDATE','green','renOv'],
   ['ck','เช็คสถานะซ่อมหลังสุด','green','renOv'],
   ['ck09','ช่วงวันรอจัดหาผู้รับจ้าง','green','renOv'],
@@ -799,7 +810,7 @@ function ovFiltered(){
   const d=getV('ov-dept'),b=getV('ov-bp'),p=getV('ov-proj'),ct=getV('ov-ctype');
   const g=getV('ov-guarantee'),cf=getV('ov-confirm'),cur=getV('ov-cur'),upd=getV('ov-upd');
   const ck9=getV('ov-ck09'),lag=getV('ov-lag'),ck=getV('ov-ck'),cklag=getV('ov-cklag'),note=getV('ov-note');
-  return AF.filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('ov-cdlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note))&&(!getV('ov-next')||x.next_custcare===getV('ov-next'))&&(!getV('ov-doc1')||(getV('ov-doc1')==='มี'?Boolean(x.doc_no1):!x.doc_no1))&&(!getV('ov-doc2')||(getV('ov-doc2')==='มี'?Boolean(x.doc_no2):!x.doc_no2)));
+  return AF.filter(x=>inLagRangeStrict(contractDateLagDays(x),getV('ov-cdlag'))&&inLagRangeStrict(reqLagDays(x),getV('ov-rqlag'))&&(!d||x.dept===d)&&(!b||x.bp===b)&&(!p||x.proj===p)&&(!ct||x.contract_type===ct)&&(!ovStatFilter||x.status===ovStatFilter)&&(!g||x.guarantee===g)&&(!cf||x.confirm_flag===cf)&&(!cur||(cur===DONE_MERGED?(x.update==='ดำเนินการเสร็จสิ้น'||x.update==='ขอเบิกเงินค่าจ้าง'):curStage(x)===cur))&&(!upd||x.update===upd)&&(!ck9||x.ck_aging09===ck9)&&inLagRangeStrict(statusLagDays(x),lag)&&(!ck||ckStatus(x)===ck)&&inCkLagRange(ckLagValue(x),cklag)&&(!note||(note==='มีหมายเหตุ'?Boolean(x.note):!x.note))&&(!getV('ov-next')||x.next_custcare===getV('ov-next'))&&(!getV('ov-doc1')||(getV('ov-doc1')==='มี'?Boolean(x.doc_no1):!x.doc_no1))&&(!getV('ov-doc2')||(getV('ov-doc2')==='มี'?Boolean(x.doc_no2):!x.doc_no2)));
 }
 function ovDeptChange(){
   const d=getV('ov-dept');
@@ -814,7 +825,7 @@ function ovBPChange(){
   updSel('ov-proj',uniq(base,'proj'),'');
   renOv();
 }
-function ovClear(){setV('ov-cdlag','');setV('ov-doc1','');setV('ov-doc2','');setV('ov-next','');
+function ovClear(){setV('ov-cdlag','');setV('ov-rqlag','');setV('ov-doc1','');setV('ov-doc2','');setV('ov-next','');
   setV('ov-dept','');setV('ov-bp','');setV('ov-proj','');setV('ov-ctype','');
   setV('ov-guarantee','');setV('ov-confirm','');setV('ov-cur','');setV('ov-upd','');
   setV('ov-ck09','');setV('ov-lag','');setV('ov-ck','');setV('ov-cklag','');setV('ov-note','');
@@ -922,7 +933,7 @@ function renOv(){
     <td style="font-size:12px;white-space:nowrap;background:#F5F3FF;border-right:2px solid #DDD6FE;">${dCell(x,11)}</td>
     <td style="text-align:right;font-weight:600;">${x.aging09||'—'}</td>
     <td><span class="badge ${x.ck_aging09?'brd':'bgy'}">${x.ck_aging09||'—'}</span></td>
-    <td style="text-align:right;font-weight:700;color:${statusLagDays(x)>30?'#DC2626':statusLagDays(x)>14?'#D97706':statusLagDays(x)!==null?'#059669':'var(--t4)'}">${statusLagDays(x)!==null?statusLagDays(x):'—'}</td>${ckLagTd(x)}
+    <td style="text-align:right;font-weight:700;color:${statusLagDays(x)>30?'#DC2626':statusLagDays(x)>14?'#D97706':statusLagDays(x)!==null?'#059669':'var(--t4)'}">${statusLagDays(x)!==null?statusLagDays(x):'—'}</td>${ckLagTd(x)}${reqLagTd(x)}
     <td style="font-size:12px;max-width:180px;white-space:normal;vertical-align:top;">${x.note||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.send_date1||'—'}</td>
     <td style="font-size:12px;white-space:nowrap;">${x.doc_no1||'—'}</td>
@@ -1590,6 +1601,7 @@ const LAG_HEADS=[
   ['tNA','วันค้างสถานะ','na-lag'],['tNA','วันค้างสถานะซ่อมหลังสุด','na-cklag'],
   ['tMNA','วันค้างสถานะ','mna-lag'],['tMNA','วันค้างสถานะซ่อมหลังสุด','mna-cklag']
 ,['tOv','วันที่ค้างสัญญา','ov-cdlag']
+,['tOv','วันค้างรับคำร้องแจ้งซ่อม','ov-rqlag']
 ,['tOvNA','วันที่ค้างสัญญา','ovna-cdlag']
 ,['tNA','วันที่ค้างสัญญา','na-cdlag']
 ,['tMNA','วันที่ค้างสัญญา','mna-cdlag']
